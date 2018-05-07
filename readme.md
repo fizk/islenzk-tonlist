@@ -34,3 +34,6 @@ Other useful commands are:
 ```sh
 $ npm run deploy
 ```
+
+## Structure
+![content-type](https://user-images.githubusercontent.com/386336/39729983-1d4cae9a-52a2-11e8-8f01-884358a995dd.png)
