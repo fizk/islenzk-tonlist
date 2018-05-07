@@ -1,0 +1,18 @@
+{
+    "presets": [
+        "@babel/preset-typescript",
+        "@babel/preset-react",
+        "@babel/preset-es2015",
+        ["@babel/preset-stage-2", { "decoratorsLegacy": true }]
+    ],
+    "plugins": [
+        "@babel/plugin-transform-modules-commonjs",
+        "@babel/plugin-transform-react-jsx",
+        ["babel-plugin-transform-require-ignore", {
+            "extensions": [".css", ".scss"]
+        }],
+        ["babel-plugin-transform-builtin-extend", {
+            "globals": ["Error", "Array"]
+        }]
+    ]
+}

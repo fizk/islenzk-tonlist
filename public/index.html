@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Title</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/bundle.css">
+  <style>
+    html {box-sizing: border-box;}
+    @font-face {
+      font-family: 'tt-webfont';
+      src: url('/fonts/tt-regular-webfont.woff2') format('woff2'); /* Super Modern Browsers */
+      font-weight: normal;
+    }
+    @font-face {
+      font-family: 'tt-webfont';
+      src: url('/fonts/tt-medium-webfont.woff2') format('woff2'); /* Super Modern Browsers */
+      font-weight: bold;
+    }
+    body {
+      box-sizing: inherit;
+      font-family: 'tt-webfont', sans-serif;
+      background-color: rgb(250, 250, 250);
+    }
+    *, *:before, *:after {margin: 0; padding: 0;}
+  </style>
+</head>
+<body>
+<div data-react-application></div>
+<script src="/bundle.js"></script>
+</body>
+</html>

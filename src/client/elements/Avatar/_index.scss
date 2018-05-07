@@ -1,0 +1,20 @@
+@import "../../config";
+@import "../../functions";
+
+.avatar {
+    display: inline-block;
+    background-size: cover;
+    background-color: map_get($color, disabled);
+    @include circle;
+}
+
+.avatar__image {
+    @include circle;
+    opacity: 0;
+    transition: opacity .2s;
+    background-size: cover;
+}
+
+.avatar__image--fade-in {
+    opacity: 1;
+}

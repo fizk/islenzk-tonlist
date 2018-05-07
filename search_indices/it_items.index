@@ -1,0 +1,61 @@
+PUT it_items
+{
+    "mappings": {
+        "item": {
+            "properties": {
+                "name": {
+                    "fields": {
+                        "raw": {
+                            "analyzer": "std_lower_case",
+                            "type": "text"
+                        }
+                    },
+                    "type": "text"
+                },
+                "description": {
+                    "fields": {
+                        "raw": {
+                            "analyzer": "std_lower_case",
+                            "type": "text"
+                        }
+                    },
+                    "type": "text"
+                },
+                "aka": {
+                    "fields": {
+                        "raw": {
+                            "analyzer": "std_lower_case",
+                            "type": "text"
+                        }
+                    },
+                    "type": "text"
+                },
+                "genres": {
+                    "type": "keyword"
+                },
+                "__contentType": {
+                    "type": "keyword"
+                },
+                "__created": {
+                    "type": "date"
+                }
+            }
+        }
+    },
+    "settings": {
+        "analysis": {
+            "analyzer": {
+                "std_lower_case": {
+                    "char_filter": [
+                        "html_strip"
+                    ],
+                    "filter": [
+                        "lowercase"
+                    ],
+                    "tokenizer": "standard",
+                    "type": "custom"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+@import "../../config";
+
+.poster {
+    display: inline-block;
+    background-size: cover;
+    background-color: map_get($color, disabled);
+}
+
+.poster__image {
+    opacity: 0;
+    transition: opacity .2s;
+    background-size: cover;
+}
+
+.poster__image--fade-in {
+    opacity: 1;
+}
