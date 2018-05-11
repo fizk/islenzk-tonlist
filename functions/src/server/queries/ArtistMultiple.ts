@@ -1,6 +1,6 @@
 import {GraphQLString, GraphQLList, GraphQLInt} from "graphql";
 import Artist from '../types/Artist';
-import {QueryDocumentSnapshot} from "@firebase/firestore-types";
+import {transformSnapshot} from "../utils/transform";
 
 export default {
     type: new GraphQLList(Artist),
@@ -23,13 +23,6 @@ export default {
             .orderBy('name')
             .startAt(start)
             .endAt(end)
-            .get().then(doc => {
-                return doc.docs.map((item: QueryDocumentSnapshot) => {
-                    return {
-                        ...item.data(),
-                        _id: item.id
-                    }
-                })
-            });
+            .get().then(doc => doc.docs.map(transformSnapshot));
     }
 };

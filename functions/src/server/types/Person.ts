@@ -15,10 +15,14 @@ import {Reference, ReferenceUnit, Unit} from "../../@types";
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import {splitContentType, splitGenre} from "../utils/split";
 import {orderAlbumType} from "../utils/order";
+import UnitInterface from "./Unit";
+import GraphQLDateTime from "./GraphQLDateTime";
+import {transformSnapshot} from "../utils/transform";
 
 const Person = new GraphQLObjectType({
     name: 'Person',
     description: 'A single Artist (a human)',
+    interfaces: [UnitInterface],
     fields: () => ({
         _id: {
             name: '_id',
@@ -27,6 +31,12 @@ const Person = new GraphQLObjectType({
         name: {
             name: 'name',
             type: new GraphQLNonNull(GraphQLString)
+        },
+        createTime: {
+            type: GraphQLDateTime,
+        },
+        updateTime: {
+            type: GraphQLDateTime,
         },
         description: {
             name: 'description',
@@ -64,7 +74,7 @@ const Person = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map((doc: DocumentSnapshot) => ({...doc.data(), _id: doc.id}))
+                    items.map(transformSnapshot)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -79,7 +89,7 @@ const Person = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map((doc: DocumentSnapshot) => ({...doc.data(), _id: doc.id}))
+                    items.map(transformSnapshot)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -94,7 +104,7 @@ const Person = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map((doc: DocumentSnapshot) => ({...doc.data(), _id: doc.id}))
+                    items.map(transformSnapshot)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -109,7 +119,7 @@ const Person = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map((doc: DocumentSnapshot) => ({...doc.data(), _id: doc.id}))
+                    items.map(transformSnapshot)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -129,13 +139,7 @@ const Person = new GraphQLObjectType({
                         group: {
                             name: 'group',
                             type: Group,
-                            resolve(root) {
-                                return root._id.get()
-                                    .then(doc => ({
-                                        ...doc.data(),
-                                        _id: doc.id
-                                    }))
-                            }
+                            resolve: (root) => root._id.get().then(transformSnapshot)
                         }
                     })
                 })),
@@ -144,7 +148,7 @@ const Person = new GraphQLObjectType({
                         .then(doc => doc.data())
                         .then((data: Reference) => {
                             return data
-                                ? (data.__ref || []).filter(item => item.__contentType === 'artist/member')
+                                ? (data.__ref || []).filter(item => item.__contentType === 'artist/person+member')
                                 : [];
                     });
                 },
@@ -158,7 +162,7 @@ const Person = new GraphQLObjectType({
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
-                    ? imagesReference._id.get().then(doc => ({...doc.data(), _id: doc.id}))
+                    ? imagesReference._id.get().then(transformSnapshot)
                     : null;
             }
         },
@@ -171,7 +175,7 @@ const Person = new GraphQLObjectType({
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
-                    ? imagesReference._id.get().then(doc => ({...doc.data(), _id: doc.id}))
+                    ? imagesReference._id.get().then(transformSnapshot)
                     : null;
             }
         },

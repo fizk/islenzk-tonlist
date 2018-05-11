@@ -2,7 +2,9 @@ import * as admin from "firebase-admin";
 import DocumentSnapshot = admin.firestore.DocumentSnapshot;
 import DocumentReference = admin.firestore.DocumentReference;
 import {Change, EventContext} from "firebase-functions/lib/cloud-functions";
-import {CollectionReference} from "@google-cloud/firestore";
+import {CollectionReference, WriteResult} from "@google-cloud/firestore";
+import {refDifference} from './reference';
+import {ReferenceUnit} from "../@types";
 
 /**
  * Takes a DocumentSnapshot. It will then, for each item in the __ref array, substitutes the _id value with a reference to this snapshot.
@@ -11,23 +13,61 @@ import {CollectionReference} from "@google-cloud/firestore";
  *
  * Complicated? Think of it this way: Makes a copy of each item in the __ref array under the `reference` collection where the _id values are reversed.
  *
+ * This function returns a function that closes over the collection and snapshot objects. The returning function returns a Promise.
+ *
  * @param {DocumentSnapshot} snapshot
  * @param {FirebaseFirestore.CollectionReference} collection
- * @return {(itemInReferenceArray) => PromiseLike<DocumentSnapshot>}
+ * @return {(referenceItem: Reference) => Promise<WriteResult>}
  */
-export const copyReferences = (snapshot: DocumentSnapshot, collection: CollectionReference) => itemInReferenceArray => {
-    const collectionDocument: DocumentReference = collection.doc(itemInReferenceArray._id.id);
+export const copyReferences = (snapshot: DocumentSnapshot, collection: CollectionReference): (referenceItem: ReferenceUnit) => Promise<WriteResult> => (referenceItem: ReferenceUnit):  Promise<WriteResult> => {
+    const collectionDocument: DocumentReference = collection.doc(referenceItem._id.id);
 
     return collectionDocument.get().then((doc: DocumentSnapshot) => {
         return doc.exists
             ? doc
             : collectionDocument.create({__ref: []}).then(() => collectionDocument.get())
     }).then((doc: DocumentSnapshot) => {
-        const refRecord = {...itemInReferenceArray, _id: snapshot.ref};
+        const refRecord = {...referenceItem, _id: snapshot.ref};
         return doc.ref.update({
             __ref: [...doc.data().__ref, refRecord]
         })
     })
+};
+
+/**
+ * For one object from the `_ref` array, tries to swap it out for a corresponding item in the `reference` collection.
+ *
+ * This function returns a function that closes over the collection objects. The returning function returns a Promise.
+ *
+ * @param {FirebaseFirestore.CollectionReference} collection
+ * @return {(referenceItem: Reference) => Promise<WriteResult>}
+ * @see copyReferences for more details
+ */
+export const updateReference = (collection: CollectionReference): (referenceItem: ReferenceUnit) => Promise<WriteResult> => (referenceItem: ReferenceUnit):  Promise<WriteResult> => {
+    const collectionDocument: DocumentReference = collection.doc(referenceItem._id.id);
+
+    return collectionDocument.get().then(doc => {
+        const ref = doc.data().__ref.map(refItem => refItem.__uuid === referenceItem.__uuid ? {...referenceItem, _id: refItem._id} : refItem);
+        return doc.ref.update({__ref: ref});
+    });
+};
+
+/**
+ * For one object from the `_ref` array, tries to remove it out for a corresponding item in the `reference` collection.
+ *
+ * This function returns a function that closes over the collection objects. The returning function returns a Promise.
+ *
+ * @param {FirebaseFirestore.CollectionReference} collection
+ * @return {(referenceItem: Reference) => Promise<WriteResult>}
+ * @see copyReferences for more details
+ */
+export const deleteReferences = (collection: CollectionReference): (referenceItem: ReferenceUnit) => Promise<WriteResult> => (referenceItem: ReferenceUnit):  Promise<WriteResult> => {
+    const collectionDocument: DocumentReference = collection.doc(referenceItem._id.id);
+
+    return collectionDocument.get().then(doc => {
+        const ref = doc.data().__ref.filter(item => item.__uuid !== referenceItem.__uuid);
+        return doc.ref.update({__ref: ref});
+    });
 };
 
 /**
@@ -82,7 +122,7 @@ export const updateSearchRecord = (index: string, type: string, elasticSearchCli
         __ref: flattenRef
     };
 
-    return elasticSearchClient.create({
+    return elasticSearchClient.update({
         index: index,
         type: type,
         id: change.after.id,
@@ -114,14 +154,56 @@ export const deleteSearchRecord = (index: string, type: string, elasticSearchCli
  * both promises will go down the road of creating that reference, one will finish before the other and the slower process will complain that the
  * resource already exists (which it didn't when it started off).
  *
- * @param {DocumentSnapshot} snapshot
- * @param {EventContext} context
+ * @param collectionReference
+ * @return {(snapshot: DocumentSnapshot, context: EventContext) => void}
  */
-export const createReferenceRecord = (snapshot: DocumentSnapshot, context: EventContext) => {
+export const createReferenceRecord = (collectionReference: CollectionReference) => (snapshot: DocumentSnapshot, context: EventContext) => {
     const data = snapshot.data();
-    const copyFunction = copyReferences(snapshot, admin.firestore().collection('reference'));
+    const copyFunction = copyReferences(snapshot, collectionReference);
 
-    data.__ref.reduce((promise, item) => {
-        return promise.then(() => copyFunction(item)).catch(console.error)
-    }, Promise.resolve());
+    return data.__ref.reduce((promise: Promise<WriteResult>, item: ReferenceUnit) => (
+        promise.then(() => copyFunction(item))
+    ), Promise.resolve({writeTime: new Date().toISOString()}))
+        .catch(console.error);
+};
+
+/**
+ * Runs the `copyReferences`, `updateReference` or `deleteReferences` function on each item in the `__ref` array in a sequence
+ * (event though they return a Promise<DocumentSnapshot>), depending on what needs to be done.
+ *
+ * @param {FirebaseFirestore.CollectionReference} collectionReference
+ * @return {(change: Change<DocumentSnapshot>, context: EventContext) => void}
+ */
+export const updateReferenceRecord = (collectionReference: CollectionReference) => (change: Change<DocumentSnapshot>, context: EventContext) => {
+    const diffObject = refDifference(change.before.data().__ref, change.after.data().__ref);
+
+    const copyFunction = copyReferences(change.after, collectionReference);
+    const addTasks = diffObject.added.map(added => ({data: added, fn: copyFunction}));
+
+    const updateFunction = updateReference(collectionReference);
+    const updateTask = diffObject.updated.map(updated => ({data: updated, fn: updateFunction}));
+
+    const deleteFunction = deleteReferences(collectionReference);
+    const deleteTask = diffObject.deleted.map(updated => ({data: updated, fn: deleteFunction}));
+
+    return [...addTasks, ...updateTask, ...deleteTask].reduce((promise: Promise<WriteResult>, item: {fn: (item: ReferenceUnit) => Promise<WriteResult>, data: ReferenceUnit}) => (
+        promise.then(() => item.fn(item.data))
+    ), Promise.resolve({writeTime: new Date().toISOString()}))
+        .catch(console.error);
+};
+
+/**
+ * Runs the `deleteReferences` function on each item in the `__ref` array in a sequence (event though `copyReferences` returns a Promise<DocumentSnapshot>).
+ *
+ * @param {FirebaseFirestore.CollectionReference} collectionReference
+ * @return {(snapshot: DocumentSnapshot, context: EventContext) => void}
+ */
+export const deleteReferenceRecord = (collectionReference: CollectionReference) => (snapshot: DocumentSnapshot , context: EventContext) => {
+    const data = snapshot.data();
+    const deleteFunction = deleteReferences(collectionReference);
+
+    return data.__ref.reduce((promise: Promise<WriteResult>, item: ReferenceUnit) => (
+        promise.then(() => deleteFunction(item))
+    ), Promise.resolve({writeTime: new Date().toISOString()}))
+        .catch(console.error);
 };

@@ -1,9 +1,9 @@
 import {GraphQLScalarType} from "graphql";
 
 export default new GraphQLScalarType({
-    name: 'GraphQLDate',
+    name: 'GraphQLDateTime',
     serialize: value => {
-        return new Date(value).toString() === 'Invalid Date' ? null : new Date(value).toISOString().split('T')[0] ;
+        return new Date(value).toString() === 'Invalid Date' ? null : new Date(value).toISOString();
     },
     parseValue: value => {
         return new Date(value).toString() === 'Invalid Date' ? null : new Date(value) ;

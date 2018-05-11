@@ -4,10 +4,15 @@ import ArtistRole from './ArtistRole';
 import {Reference, ReferenceUnit} from "../../@types";
 import Genre from "./Genre";
 import {splitContentType} from "../utils/split";
+import UnitInterface from "./Unit";
+import Content from "./Content";
+import GraphQLDateTime from "./GraphQLDateTime";
+import {transformSnapshot} from "../utils/transform";
 
 const Item = new GraphQLObjectType({
     name: 'Item',
     description: 'A part of a collection',
+    interfaces: [UnitInterface],
     fields: () => ({
         _id: {
             type: new GraphQLNonNull(GraphQLID)
@@ -15,11 +20,22 @@ const Item = new GraphQLObjectType({
         name: {
             type: new GraphQLNonNull(GraphQLString)
         },
+        createTime: {
+            type: GraphQLDateTime,
+        },
+        updateTime: {
+            type: GraphQLDateTime,
+        },
         description: {
             type: GraphQLString
         },
         duration: {
             type: GraphQLInt
+        },
+        contentType: {
+            name: 'contentType',
+            type: Content,
+            resolve: (root) => splitContentType(root.__contentType)
         },
         genres: {
             name: 'genres',
@@ -54,7 +70,7 @@ const Item = new GraphQLObjectType({
                     .then(doc => doc.data())
                     .then((data: Reference) => data.__ref.filter(item => item.__contentType === 'item/song'))
                     .then((items: ReferenceUnit[]) => Promise.all(items.map(item => item._id.get())))
-                    .then(items => items.map(doc => ({...doc.data(), _id: doc.id})));
+                    .then(items => items.map(transformSnapshot));
 
             }
         }

@@ -1,14 +1,19 @@
-import {GraphQLObjectType, GraphQLString, GraphQLID} from "graphql";
+import {GraphQLObjectType, GraphQLString, GraphQLID, GraphQLNonNull} from "graphql";
 import Image from './Image';
 import {ReferenceUnit} from "../../@types";
+import UnitInterface from "./Unit";
+import Content from "./Content";
+import {splitContentType} from "../utils/split";
+import GraphQLDateTime from "./GraphQLDateTime";
+import {transformSnapshot} from "../utils/transform";
 
 export default new GraphQLObjectType({
     name: 'Publisher',
     description: 'publisher of a collection',
+    interfaces: [UnitInterface],
     fields: {
         _id: {
-            name: '_id',
-            type: GraphQLID
+            type: new GraphQLNonNull(GraphQLID)
         },
         name: {
             name: 'name',
@@ -17,6 +22,17 @@ export default new GraphQLObjectType({
         description: {
             name: 'description',
             type: GraphQLString,
+        },
+        createTime: {
+            type: GraphQLDateTime,
+        },
+        updateTime: {
+            type: GraphQLDateTime,
+        },
+        contentType: {
+            name: 'contentType',
+            type: Content,
+            resolve: (root) => splitContentType(root.__contentType)
         },
         avatar: {
             name: 'avatar',
@@ -27,7 +43,7 @@ export default new GraphQLObjectType({
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
-                    ? imagesReference._id.get().then(doc => ({...doc.data(), _id: doc.id}))
+                    ? imagesReference._id.get().then(transformSnapshot)
                     : null;
             }
         },
@@ -40,7 +56,7 @@ export default new GraphQLObjectType({
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
-                    ? imagesReference._id.get().then(doc => ({...doc.data(), _id: doc.id}))
+                    ? imagesReference._id.get().then(transformSnapshot)
                     : null;
             }
         },

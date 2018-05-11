@@ -1,5 +1,6 @@
 import {GraphQLNonNull, GraphQLID} from "graphql";
 import Collection from '../types/Collection';
+import {transformSnapshot} from "../utils/transform";
 
 export default {
     type: Collection,
@@ -10,11 +11,7 @@ export default {
         }
     },
     resolve (root, {id}, {database}) {
-        return database.doc(`/collections/${id}`).get().then(doc => ({
-                ...doc.data(),
-                _id: doc.id
-            }
-        ));
+        return database.doc(`/collections/${id}`).get().then(transformSnapshot);
     }
 };
 

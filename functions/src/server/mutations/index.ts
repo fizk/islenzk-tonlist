@@ -15,7 +15,6 @@ import ImageSetAvatar from './ImageSetAvatar';
 import ImageSetHero from './ImageSetHero';
 import ItemAdd from './ItemAdd';
 import ItemConnectArtistForRole from './ItemConnectArtistForRole';
-import UnitAdd from './UnitAdd';
 
 export default {
     ArtistAdd,
@@ -33,6 +32,5 @@ export default {
     ImageSetAvatar,
     ImageSetHero,
     ItemAdd,
-    ItemConnectArtistForRole,
-    UnitAdd,
+    ItemConnectArtistForRole
 };

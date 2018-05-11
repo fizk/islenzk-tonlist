@@ -1,5 +1,6 @@
 import {GraphQLID, GraphQLNonNull} from "graphql";
 import Item from '../types/Item';
+import {transformSnapshot} from "../utils/transform";
 
 export default {
     type: Item,
@@ -9,12 +10,8 @@ export default {
             type: new GraphQLNonNull(GraphQLID)
         }
     },
-    resolve (root, {id}, {database, queue }) {
-        return database.doc(`/items/${id}`).get().then(doc => ({
-                ...doc.data(),
-                _id: doc.id
-            }
-        ));
+    resolve (root, {id}, {database}) {
+        return database.doc(`/items/${id}`).get().then(transformSnapshot);
     }
 };
 

@@ -3,6 +3,7 @@ import GraphQLDate from './GraphQLDate';
 import Publisher from './Publisher';
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import {Reference, ReferenceUnit} from "../../@types";
+import {transformSnapshot} from "../utils/transform";
 
 export default new GraphQLObjectType({
     name: 'Publication',
@@ -28,7 +29,7 @@ export default new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => {
-                    return items.map((doc: DocumentSnapshot) => ({...doc.data(), _id: doc.id}))
+                    return items.map(transformSnapshot)
                 });
             }
         },
