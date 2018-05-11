@@ -8,7 +8,10 @@ import {ReferenceUnit} from "../@types";
  * @param {ReferenceUnit} two
  * @return {boolean}
  */
-const equal = (one, two) => {
+const equal = (
+    one: {_id: {isEqual: (any) => boolean}},
+    two: {_id: {isEqual: (any) => boolean}}
+) => {
     try {
         const restOne = {
             ...one,

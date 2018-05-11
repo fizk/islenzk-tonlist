@@ -12,7 +12,7 @@ import Content from "./Content";
 import Person from "./Person";
 import {orderAlbumType} from '../utils/order';
 import {splitContentType, splitGenre} from '../utils/split';
-import {AlbumType, Reference, ReferenceUnit, Unit} from "../../@types";
+import {Reference, ReferenceUnit, Unit} from "../../@types";
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";

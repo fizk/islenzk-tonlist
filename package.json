@@ -10,7 +10,7 @@
     "dev": "npm run webpack-dev-server & npm run client:watch",
     "client:watch": "webpack -w",
     "server:watch": "babel --extensions \".tsx,.ts\" --source-maps-inline -w --out-dir ./dist ./src/",
-    "lint": "eslint --ext .ts,.tsx ./src/**",
+    "lint": "tslint --project tsconfig.json",
     "test": "jest",
     "webpack-dev-server": "webpack-dev-server",
     "storybook": "start-storybook -p 9001 -c .storybook"
@@ -78,6 +78,7 @@
     "rimraf": "^2.6.2",
     "sass-loader": "^6.0.7",
     "style-loader": "^0.20.2",
+    "tslint": "^5.8.0",
     "ts-jest": "^22.4.2",
     "ts-loader": "^v3.5.0",
     "ts-node": "^5.0.1",
