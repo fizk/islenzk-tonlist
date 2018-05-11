@@ -1,49 +1,27 @@
-import {
-    GraphQLID,
-    GraphQLNonNull,
-    GraphQLString,
-    GraphQLObjectType,
-    GraphQLInputObjectType
-} from "graphql";
-import Content, {ContentTypeInput} from './Content';
+import {GraphQLID, GraphQLInterfaceType, GraphQLNonNull, GraphQLString} from "graphql";
+import GraphQLDateTime from "./GraphQLDateTime";
+import Content from "./Content";
 
-const Unit = new GraphQLObjectType({
-    name: 'Unit',
-    description: 'A single Unit',
-    fields: () => ({
+export default new GraphQLInterfaceType({
+    name: 'Entity',
+    fields: {
         _id: {
-            name: '_id',
             type: new GraphQLNonNull(GraphQLID)
         },
         name: {
-            name: 'name',
-            type: new GraphQLNonNull(GraphQLString)
+            type: GraphQLString
+        },
+        description: {
+            type: GraphQLString
         },
         contentType: {
-            name: 'contentType',
             type: Content,
-            resolve(root) {
-                // tslint:disable-next-line
-                const [m0, type, subtype, m1, m2, attribute] = (root.__contentType || '').match(/([a-z]*)\/([a-z]*)?((\+)([a-z]*))?/) || [undefined, undefined, undefined, undefined, undefined, undefined];
-                return {type, subtype, attribute};
-            }
         },
-    })
+        createTime: {
+            type: GraphQLDateTime,
+        },
+        updateTime: {
+            type: GraphQLDateTime,
+        },
+    }
 });
-
-const UnitInput = new GraphQLInputObjectType({
-    name: 'UnitInput',
-    fields: {
-        name: {
-            name: 'name',
-            type: new GraphQLNonNull(GraphQLString)
-        },
-        contentType: {
-            name: 'contentType',
-            type: new GraphQLNonNull(ContentTypeInput),
-        },
-    },
-});
-
-export default Unit;
-export {UnitInput};

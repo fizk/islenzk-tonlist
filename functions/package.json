@@ -8,7 +8,8 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "dev": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/develop.ts"
+    "dev": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/develop.ts",
+    "test": "jest"
   },
   "main": "lib/index.js",
   "dependencies": {
@@ -23,10 +24,30 @@
     "graphql": "^0.13.2"
   },
   "devDependencies": {
+    "@types/jest": "^22.2.3",
+    "jest": "^22.4.3",
     "nodemon": "^1.17.3",
+    "ts-jest": "^22.4.5",
     "ts-node": "^6.0.1",
     "tslint": "^5.8.0",
     "typescript": "^2.5.3"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   },
   "private": true
 }

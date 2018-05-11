@@ -12,10 +12,14 @@ import {Reference, ReferenceUnit} from "../../@types";
 import Genre from "./Genre";
 import {splitContentType, splitGenre} from '../utils/split'
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
+import UnitInterface from "./Unit";
+import GraphQLDateTime from "./GraphQLDateTime";
+import {transformSnapshot} from "../utils/transform";
 
 export default new GraphQLObjectType({
     name: 'Collection',
     description: 'A single collection',
+    interfaces: [UnitInterface],
     fields: () => ({
         _id: {
             type: new GraphQLNonNull(GraphQLID)
@@ -39,6 +43,12 @@ export default new GraphQLObjectType({
         releaseDates: {
             type: GraphQLDate,
         },
+        createTime: {
+            type: GraphQLDateTime,
+        },
+        updateTime: {
+            type: GraphQLDateTime,
+        },
         contentType: {
             name: 'contentType',
             type: Content,
@@ -52,7 +62,7 @@ export default new GraphQLObjectType({
                     .then(doc => doc.data())
                     .then((data: Reference) => (data ? (data.__ref || []).filter(item => item.__contentType === 'collection/album') : []))
                     .then((items: ReferenceUnit[]) => Promise.all(items.map(item => item._id.get())))
-                    .then(items => items.map(doc => ({...doc.data(), _id: doc.id})));
+                    .then(items => items.map(transformSnapshot));
             }
         },
         avatar: {
@@ -64,7 +74,7 @@ export default new GraphQLObjectType({
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
-                    ? imagesReference._id.get().then(doc => ({...doc.data(), _id: doc.id}))
+                    ? imagesReference._id.get().then(transformSnapshot)
                     : null;
             }
         },
@@ -77,7 +87,7 @@ export default new GraphQLObjectType({
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
-                    ? imagesReference._id.get().then(doc => ({...doc.data(), _id: doc.id}))
+                    ? imagesReference._id.get().then(transformSnapshot)
                     : null;
             }
         },
@@ -93,12 +103,7 @@ export default new GraphQLObjectType({
                     song: {
                         name: 'song',
                         type: Item,
-                        resolve(root) {
-                            return root._id.get().then(doc => ({
-                                ...doc.data(),
-                                _id: doc.id
-                            }))
-                        }
+                        resolve: (root) => root._id.get().then(transformSnapshot)
                     }
                 }
             })),
@@ -114,9 +119,7 @@ export default new GraphQLObjectType({
                     .filter((item:ReferenceUnit) => item.__contentType === 'publisher/publication')
                     .map(item => item._id.get());
 
-                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => {
-                    return items.map((doc: DocumentSnapshot) => ({...doc.data(), _id: doc.id}))
-                });
+                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => items.map(transformSnapshot));
             }
         },
         performers: {

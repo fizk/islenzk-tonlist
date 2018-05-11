@@ -14,10 +14,14 @@ import {orderAlbumType} from '../utils/order';
 import {splitContentType, splitGenre} from '../utils/split';
 import {Reference, ReferenceUnit, Unit} from "../../@types";
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
+import UnitInterface from "./Unit";
+import GraphQLDateTime from "./GraphQLDateTime";
+import {transformSnapshot} from "../utils/transform";
 
 const Group = new GraphQLObjectType({
     name: 'Group',
     description: 'A single Group (or artists)',
+    interfaces: [UnitInterface],
     fields: () => ({
         _id: {
             name: '_id',
@@ -27,10 +31,15 @@ const Group = new GraphQLObjectType({
             name: 'name',
             type: new GraphQLNonNull(GraphQLString)
         },
+        createTime: {
+            type: GraphQLDateTime,
+        },
+        updateTime: {
+            type: GraphQLDateTime,
+        },
         description: {
             name: 'description',
             type: GraphQLString,
-
         },
         aka: {
             name: 'Also known as',
@@ -63,9 +72,9 @@ const Group = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map((doc: DocumentSnapshot) => ({...doc.data(), _id: doc.id}))
+                    items.map(transformSnapshot)
                         .slice()
-                        .sort(orderAlbumType)
+                        // .sort(orderAlbumType) //@todo
                 ));
             }
         },
@@ -78,9 +87,9 @@ const Group = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map((doc: DocumentSnapshot) => ({...doc.data(), _id: doc.id}))
+                    items.map(transformSnapshot)
                         .slice()
-                        .sort(orderAlbumType)
+                    // .sort(orderAlbumType) //@todo
                 ));
             }
         },
@@ -93,9 +102,9 @@ const Group = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map((doc: DocumentSnapshot) => ({...doc.data(), _id: doc.id}))
+                    items.map(transformSnapshot)
                         .slice()
-                        .sort(orderAlbumType)
+                    // .sort(orderAlbumType) //@todo
                 ));
             }
         },
@@ -108,9 +117,9 @@ const Group = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map((doc: DocumentSnapshot) => ({...doc.data(), _id: doc.id}))
+                    items.map(transformSnapshot)
                         .slice()
-                        .sort(orderAlbumType)
+                    // .sort(orderAlbumType) //@todo
                 ));
             }
         },
@@ -128,13 +137,7 @@ const Group = new GraphQLObjectType({
                     artist: {
                         name: 'Person',
                         type: Person,
-                        resolve(root: ReferenceUnit) {
-                            return root._id.get()
-                                .then(doc => ({
-                                    ...doc.data(),
-                                    _id: doc.id
-                                }))
-                        }
+                        resolve: (root: ReferenceUnit) => root._id.get().then(transformSnapshot)
                     }
                 })
             })),
@@ -151,7 +154,7 @@ const Group = new GraphQLObjectType({
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
-                    ? imagesReference._id.get().then(doc => ({...doc.data(), _id: doc.id}))
+                    ? imagesReference._id.get().then(transformSnapshot)
                     : null;
             }
         },
@@ -164,7 +167,7 @@ const Group = new GraphQLObjectType({
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
-                    ? imagesReference._id.get().then(doc => ({...doc.data(), _id: doc.id}))
+                    ? imagesReference._id.get().then(transformSnapshot)
                     : null;
             }
         },
