@@ -76,7 +76,7 @@ const Person = new GraphQLObjectType({
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
                     items.map(transformSnapshot)
                         .slice()
-                        // .sort(orderAlbumType) //@todo
+                        .sort(orderAlbumType)
                 ));
             }
         },
@@ -91,7 +91,7 @@ const Person = new GraphQLObjectType({
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
                     items.map(transformSnapshot)
                         .slice()
-                    // .sort(orderAlbumType) //@todo
+                        .sort(orderAlbumType)
                 ));
             }
         },
@@ -106,7 +106,7 @@ const Person = new GraphQLObjectType({
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
                     items.map(transformSnapshot)
                         .slice()
-                    // .sort(orderAlbumType) //@todo
+                        .sort(orderAlbumType)
                 ));
             }
         },
@@ -121,7 +121,7 @@ const Person = new GraphQLObjectType({
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
                     items.map(transformSnapshot)
                         .slice()
-                    // .sort(orderAlbumType) //@todo
+                        .sort(orderAlbumType)
                 ));
             }
         },
@@ -148,7 +148,7 @@ const Person = new GraphQLObjectType({
                         .then(doc => doc.data())
                         .then((data: Reference) => {
                             return data
-                                ? (data.__ref || []).filter(item => item.__contentType === 'artist/member')
+                                ? (data.__ref || []).filter(item => item.__contentType === 'artist/person+member')
                                 : [];
                     });
                 },

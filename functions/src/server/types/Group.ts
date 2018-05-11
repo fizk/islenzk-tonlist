@@ -12,7 +12,7 @@ import Content from "./Content";
 import Person from "./Person";
 import {orderAlbumType} from '../utils/order';
 import {splitContentType, splitGenre} from '../utils/split';
-import {Reference, ReferenceUnit, Unit} from "../../@types";
+import {AlbumType, Reference, ReferenceUnit, Unit} from "../../@types";
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";
@@ -74,7 +74,7 @@ const Group = new GraphQLObjectType({
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
                     items.map(transformSnapshot)
                         .slice()
-                        // .sort(orderAlbumType) //@todo
+                        .sort(orderAlbumType)
                 ));
             }
         },
@@ -89,7 +89,7 @@ const Group = new GraphQLObjectType({
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
                     items.map(transformSnapshot)
                         .slice()
-                    // .sort(orderAlbumType) //@todo
+                        .sort(orderAlbumType)
                 ));
             }
         },
@@ -104,7 +104,7 @@ const Group = new GraphQLObjectType({
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
                     items.map(transformSnapshot)
                         .slice()
-                    // .sort(orderAlbumType) //@todo
+                        .sort(orderAlbumType)
                 ));
             }
         },
@@ -119,7 +119,7 @@ const Group = new GraphQLObjectType({
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
                     items.map(transformSnapshot)
                         .slice()
-                    // .sort(orderAlbumType) //@todo
+                        .sort(orderAlbumType)
                 ));
             }
         },
@@ -142,7 +142,7 @@ const Group = new GraphQLObjectType({
                 })
             })),
             resolve(root: Reference) {
-                return root.__ref.filter(item => item.__contentType === 'artist/member');
+                return root.__ref.filter(item => item.__contentType === 'artist/person+member');
             },
         },
         avatar: {

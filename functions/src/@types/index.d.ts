@@ -3,7 +3,6 @@ import admin from "firebase-admin";
 type ID = string;
 type UUID = string;
 
-
 // -- -- -- -- [ABSTRACT] -- -- -- -- -- -- -- -- -- -- --
 export interface ReferenceUnit {
     _id: admin.firestore.DocumentReference
@@ -15,13 +14,13 @@ export interface ReferenceUnit {
 
 export interface Reference {
     _id: admin.firestore.DocumentReference
-    __uuid: UUID
     __ref: ReferenceUnit[]
 }
 
-export interface Unit {
-    _id: ID
-    __created: Date
+export interface Unit{
+    _id: string
+    updateTime: string
+    createTime: string
     __contentType: string
     __ref: ReferenceUnit[]
     [key: string]: any

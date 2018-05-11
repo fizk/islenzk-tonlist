@@ -22,7 +22,6 @@ export default {
 
         const data = Object.assign({
             __contentType: `artist/${type}`,
-            __created: new Date(),
             __ref: [],
             aka: [],
             description: null,

@@ -1,6 +1,13 @@
 import assert from 'assert';
 import {ReferenceUnit} from "../@types";
 
+/**
+ * Compare two ReferenceUnit items.
+ *
+ * @param {ReferenceUnit} one
+ * @param {ReferenceUnit} two
+ * @return {boolean}
+ */
 const equal = (one, two) => {
     try {
         const restOne = {
@@ -18,7 +25,13 @@ const equal = (one, two) => {
     }
 };
 
-
+/**
+ * Create a `diff` object out of two arrays of ReferenceUnits.
+ *
+ * @param one
+ * @param two
+ * @return {added: ReferenceUnits[]; updated: ReferenceUnits[]; deleted: ReferenceUnits[]}
+ */
 export const refDifference = (one, two): {added: any[], updated: any[], deleted: any[]} => {
     const beforeObject = one.reduce((collection, item: ReferenceUnit) => {
         collection[item.__uuid] = {before: item, after: null};

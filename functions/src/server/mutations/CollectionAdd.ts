@@ -17,7 +17,6 @@ export default {
 
         const data = Object.assign({
             __contentType: `collection/${type}`,
-            __created: new Date(),
             __ref: [],
             aka: [],
             description: null,
