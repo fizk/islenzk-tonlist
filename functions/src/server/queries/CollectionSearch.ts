@@ -1,6 +1,6 @@
 import {GraphQLString, GraphQLList, GraphQLInt, GraphQLNonNull} from "graphql";
 import Collection from '../types/Collection';
-import CollectionType from "../types/CollectionType";
+import {CollectionType} from "../types/Collection";
 
 export default {
     type: new GraphQLList(Collection),

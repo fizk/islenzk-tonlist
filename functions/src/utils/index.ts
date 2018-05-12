@@ -46,8 +46,17 @@ export const copyReferences = (snapshot: DocumentSnapshot, collection: Collectio
 export const updateReference = (collection: CollectionReference): (referenceItem: ReferenceUnit) => Promise<WriteResult> => (referenceItem: ReferenceUnit):  Promise<WriteResult> => {
     const collectionDocument: DocumentReference = collection.doc(referenceItem._id.id);
 
-    return collectionDocument.get().then(doc => {
-        const ref = doc.data().__ref.map(refItem => refItem.__uuid === referenceItem.__uuid ? {...referenceItem, _id: refItem._id} : refItem);
+    return collectionDocument.get().then((doc: DocumentSnapshot) => {
+        return doc.exists
+            ? doc
+            : collectionDocument.create({__ref: []}).then(() => collectionDocument.get());
+    }).then(doc => {
+        const ref = doc.data().__ref.map(refItem => {
+            return refItem.__uuid === referenceItem.__uuid
+                ? {...referenceItem, _id: refItem._id}
+                : refItem
+            }
+        );
         return doc.ref.update({__ref: ref});
     });
 };
@@ -65,8 +74,12 @@ export const deleteReferences = (collection: CollectionReference): (referenceIte
     const collectionDocument: DocumentReference = collection.doc(referenceItem._id.id);
 
     return collectionDocument.get().then(doc => {
-        const ref = doc.data().__ref.filter(item => item.__uuid !== referenceItem.__uuid);
-        return doc.ref.update({__ref: ref});
+        if (doc.exists) {
+            const ref = doc.data().__ref.filter(item => item.__uuid !== referenceItem.__uuid);
+            return doc.ref.update({__ref: ref});
+        } else {
+            return Promise.resolve({writeTime: new Date().toISOString(), isEqual: () => false});
+        }
     });
 };
 
@@ -126,7 +139,7 @@ export const updateSearchRecord = (index: string, type: string, elasticSearchCli
         index: index,
         type: type,
         id: change.after.id,
-        body: filteredData
+        body: {doc: filteredData}
     });
 };
 
@@ -163,8 +176,7 @@ export const createReferenceRecord = (collectionReference: CollectionReference) 
 
     return data.__ref.reduce((promise: Promise<WriteResult>, item: ReferenceUnit) => (
         promise.then(() => copyFunction(item))
-    ), Promise.resolve({writeTime: new Date().toISOString()}))
-        .catch(console.error);
+    ), Promise.resolve({writeTime: new Date().toISOString()}));
 };
 
 /**
@@ -188,8 +200,7 @@ export const updateReferenceRecord = (collectionReference: CollectionReference) 
 
     return [...addTasks, ...updateTask, ...deleteTask].reduce((promise: Promise<WriteResult>, item: {fn: (item: ReferenceUnit) => Promise<WriteResult>, data: ReferenceUnit}) => (
         promise.then(() => item.fn(item.data))
-    ), Promise.resolve({writeTime: new Date().toISOString()}))
-        .catch(console.error);
+    ), Promise.resolve({writeTime: new Date().toISOString()}));
 };
 
 /**
@@ -204,6 +215,5 @@ export const deleteReferenceRecord = (collectionReference: CollectionReference) 
 
     return data.__ref.reduce((promise: Promise<WriteResult>, item: ReferenceUnit) => (
         promise.then(() => deleteFunction(item))
-    ), Promise.resolve({writeTime: new Date().toISOString()}))
-        .catch(console.error);
+    ), Promise.resolve({writeTime: new Date().toISOString()}));
 };

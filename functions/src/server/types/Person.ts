@@ -17,6 +17,7 @@ import {splitContentType, splitGenre} from "../utils/split";
 import {orderAlbumType} from "../utils/order";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";
+import GraphQLUUID from 'graphql-tools-type-uuid';
 import {transformSnapshot} from "../utils/transform";
 
 const Person = new GraphQLObjectType({
@@ -140,6 +141,10 @@ const Person = new GraphQLObjectType({
                             name: 'group',
                             type: Group,
                             resolve: (root) => root._id.get().then(transformSnapshot)
+                        },
+                        uuid: {
+                            type: new GraphQLNonNull(GraphQLUUID),
+                            resolve: (root: ReferenceUnit) => root.__uuid
                         }
                     })
                 })),

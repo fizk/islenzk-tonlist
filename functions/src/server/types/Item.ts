@@ -1,15 +1,18 @@
-import {GraphQLID, GraphQLNonNull, GraphQLString, GraphQLObjectType, GraphQLInt, GraphQLList} from "graphql";
+import {
+    GraphQLID, GraphQLNonNull, GraphQLString, GraphQLObjectType, GraphQLInt, GraphQLList,
+    GraphQLInputObjectType, GraphQLEnumType
+} from "graphql";
 import Collection from './Collection';
 import ArtistRole from './ArtistRole';
 import {Reference, ReferenceUnit} from "../../@types";
-import Genre from "./Genre";
+import Genre, {GenreInput} from "./Genre";
 import {splitContentType} from "../utils/split";
 import UnitInterface from "./Unit";
 import Content from "./Content";
 import GraphQLDateTime from "./GraphQLDateTime";
 import {transformSnapshot} from "../utils/transform";
 
-const Item = new GraphQLObjectType({
+export default new GraphQLObjectType({
     name: 'Item',
     description: 'A part of a collection',
     interfaces: [UnitInterface],
@@ -71,11 +74,32 @@ const Item = new GraphQLObjectType({
                     .then((data: Reference) => data.__ref.filter(item => item.__contentType === 'item/song'))
                     .then((items: ReferenceUnit[]) => Promise.all(items.map(item => item._id.get())))
                     .then(items => items.map(transformSnapshot));
-
             }
         }
     })
 });
 
+export const ItemInput = new GraphQLInputObjectType({
+    name: 'ItemInput',
+    fields: {
+        name: {
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        description: {
+            type: GraphQLString,
+        },
+        duration: {
+            type: GraphQLInt
+        },
+        genres: {
+            type: new GraphQLList(GenreInput)
+        }
+    }
+});
 
-export default Item;
+export const ItemType = new GraphQLEnumType({
+    name: 'ItemType',
+    values: {
+        song: {value: 'song'},
+    }
+});

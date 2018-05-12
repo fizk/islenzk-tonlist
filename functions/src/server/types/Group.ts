@@ -16,6 +16,7 @@ import {Reference, ReferenceUnit, Unit} from "../../@types";
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";
+import GraphQLUUID from 'graphql-tools-type-uuid';
 import {transformSnapshot} from "../utils/transform";
 
 const Group = new GraphQLObjectType({
@@ -138,6 +139,10 @@ const Group = new GraphQLObjectType({
                         name: 'Person',
                         type: Person,
                         resolve: (root: ReferenceUnit) => root._id.get().then(transformSnapshot)
+                    },
+                    uuid: {
+                        type: new GraphQLNonNull(GraphQLUUID),
+                        resolve: (root: ReferenceUnit) => root.__uuid
                     }
                 })
             })),

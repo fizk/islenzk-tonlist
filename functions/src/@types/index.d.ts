@@ -6,7 +6,7 @@ type UUID = string;
 // -- -- -- -- [ABSTRACT] -- -- -- -- -- -- -- -- -- -- --
 export interface ReferenceUnit {
     _id: admin.firestore.DocumentReference
-    __created: Date
+    __created?: Date
     __uuid: UUID
     __contentType: string
     [key: string]: any

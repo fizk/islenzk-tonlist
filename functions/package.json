@@ -21,7 +21,9 @@
     "express-graphql": "^0.6.12",
     "firebase-admin": "~5.12.0",
     "firebase-functions": "^1.0.2",
-    "graphql": "^0.13.2"
+    "graphql": "^0.13.2",
+    "graphql-tools-type-uuid": "^1.0.2",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@types/jest": "^22.2.3",

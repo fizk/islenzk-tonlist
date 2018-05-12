@@ -28,6 +28,7 @@
     "d3-time": "^1.0.8",
     "express": "^4.16.3",
     "express-graphql": "^0.6.12",
+    "firebase": "^5.0.2",
     "graphql": "^0.13.2",
     "graphql-iso-date": "^3.5.0",
     "graphql-tag": "^2.9.1",

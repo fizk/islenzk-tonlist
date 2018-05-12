@@ -1,42 +1,21 @@
 import {GraphQLID, GraphQLNonNull} from 'graphql';
 import Collection, {CollectionInput} from '../types/Collection'
+import {transformSnapshot} from "../utils/transform";
 
 export default {
     type: Collection,
     args: {
-        id: {
-            name: 'id',
+        collection: {
             type: new GraphQLNonNull(GraphQLID),
         },
-        collection: {
-            name: 'collection',
-            type: CollectionInput
+        values: {
+            type: new GraphQLNonNull(CollectionInput)
         },
     },
-    resolve (root, {collection, id}, {database, search, }) {
-        return {}
-        // return database.findOneAndUpdate(
-        //     {_id: new ObjectID(id)},
-        //     {$set: collection},
-        //     {returnOriginal: false}
-        // ).then(result => {
-        //
-        //     if (result.ok) {
-        //         const {_id, ...rest, } = result.value;
-        //         const searchData = {
-        //             ...rest,
-        //             releaseDates: rest.releaseDates ? rest.releaseDates.getTime() : null,
-        //         };
-        //
-        //         search.index({
-        //             index: 'application',
-        //             type: 'collection',
-        //             id: _id.toString(),
-        //             body: searchData,
-        //         });
-        //
-        //         return result.value;
-        //     }
-        // });
+    resolve (root, {values, artist}, {database,}) {
+        const document = database.doc(`collections/${artist}`);
+
+        return document.update(Object.assign({}, values)).then(() => document.get())
+            .then(transformSnapshot);
     }
 };

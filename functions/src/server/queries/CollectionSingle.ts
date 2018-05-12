@@ -1,6 +1,7 @@
 import {GraphQLNonNull, GraphQLID} from "graphql";
 import Collection from '../types/Collection';
 import {transformSnapshot} from "../utils/transform";
+import {QueryDocumentSnapshot} from "@google-cloud/firestore";
 
 export default {
     type: Collection,
@@ -11,7 +12,8 @@ export default {
         }
     },
     resolve (root, {id}, {database}) {
-        return database.doc(`/collections/${id}`).get().then(transformSnapshot);
+        return database.doc(`/collections/${id}`).get()
+            .then((snapshot: QueryDocumentSnapshot) => snapshot.exists ? transformSnapshot(snapshot) : null);
     }
 };
 

@@ -1,6 +1,6 @@
 import {GraphQLNonNull} from 'graphql';
-import Collection, {CollectionInput} from '../types/Collection';
-import CollectionType from "../types/CollectionType";
+import Collection, {CollectionInput, CollectionType} from '../types/Collection';
+import {transformSnapshot} from "../utils/transform";
 
 export default {
     type: Collection,
@@ -26,11 +26,6 @@ export default {
 
         return database.collection('collections').add(data)
             .then(doc => doc.get())
-            .then(snapshot => {
-                return {
-                    _id: snapshot.id,
-                    ...snapshot.data()
-                }
-            });
+            .then(transformSnapshot);
     }
 };

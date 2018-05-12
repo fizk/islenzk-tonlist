@@ -1,6 +1,7 @@
 import {
     GraphQLID, GraphQLNonNull, GraphQLString, GraphQLObjectType, GraphQLList,
-    GraphQLInputObjectType, GraphQLInt
+    GraphQLInputObjectType, GraphQLInt,
+    GraphQLEnumType
 } from 'graphql';
 import GraphQLDate from './GraphQLDate';
 import Item from './Item'
@@ -9,7 +10,7 @@ import Publication from './Publication';
 import Content from './Content'
 import Artist from './Artist';
 import {Reference, ReferenceUnit} from "../../@types";
-import Genre from "./Genre";
+import Genre, {GenreInput} from "./Genre";
 import {splitContentType, splitGenre} from '../utils/split'
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import UnitInterface from "./Unit";
@@ -141,7 +142,7 @@ export default new GraphQLObjectType({
     })
 });
 
-const CollectionInput = new GraphQLInputObjectType({
+export const CollectionInput = new GraphQLInputObjectType({
     name: 'CollectionInput',
     fields: {
         name: {
@@ -162,9 +163,18 @@ const CollectionInput = new GraphQLInputObjectType({
         },
         genres: {
             name: 'genre',
-            type: new GraphQLList(GraphQLString),
+            type: new GraphQLList(GenreInput),
         },
     },
 });
 
-export {CollectionInput}
+export const CollectionType = new GraphQLEnumType({
+    name: 'CollectionType',
+    values: {
+        album: {value: 'album'},
+        ep: {value: 'album+ep'},
+        single: {value: 'album+single'},
+        compilation: {value: 'album+compilation'},
+    }
+});
+

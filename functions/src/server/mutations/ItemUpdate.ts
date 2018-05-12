@@ -1,19 +1,19 @@
 import {GraphQLNonNull, GraphQLID} from 'graphql';
-import Artist, {ArtistInput} from '../types/Artist'
 import {transformSnapshot} from "../utils/transform";
+import Item, {ItemInput} from "../types/Item";
 
 export default {
-    type: Artist,
+    type: Item,
     args: {
-        artist: {
+        item: {
             type: new GraphQLNonNull(GraphQLID),
         },
         values: {
-            type: new GraphQLNonNull(ArtistInput),
+            type: new GraphQLNonNull(ItemInput),
         },
     },
-    resolve (root, {values, artist}, {database,}) {
-        const document = database.doc(`artists/${artist}`);
+    resolve (root, {values, item}, {database,}) {
+        const document = database.doc(`item/${item}`);
 
         return document.update(Object.assign({}, values)).then(() => document.get())
             .then(transformSnapshot);
