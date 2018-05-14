@@ -74,6 +74,7 @@ const Group = new GraphQLObjectType({
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
                     items.map(transformSnapshot)
+                        .filter(item => item !== null)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -87,11 +88,11 @@ const Group = new GraphQLObjectType({
                     .filter((item:ReferenceUnit) => item.__contentType === 'collection/album+compilation')
                     .map(item => item._id.get());
 
-                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map(transformSnapshot)
+                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => {
+                    return items.map(transformSnapshot)
                         .slice()
                         .sort(orderAlbumType)
-                ));
+                });
             }
         },
         eps: {
@@ -102,11 +103,11 @@ const Group = new GraphQLObjectType({
                     .filter((item:ReferenceUnit) => item.__contentType === 'collection/album+ep')
                     .map(item => item._id.get());
 
-                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map(transformSnapshot)
+                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => {
+                    return items.map(transformSnapshot)
                         .slice()
                         .sort(orderAlbumType)
-                ));
+                });
             }
         },
         singles: {

@@ -1,13 +1,13 @@
 import {GraphQLID, GraphQLNonNull} from 'graphql';
-import Collection from '../types/Collection'
+import {CollectionType} from '../types/Collection'
 import {QueryDocumentSnapshot} from "@google-cloud/firestore";
 import {ReferenceUnit} from "../../@types";
 import * as uuid from 'uuid/v4';
 import {transformSnapshot} from "../utils/transform";
-import {CollectionType} from "../types/Collection";
+import Artist from "../types/Artist";
 
 export default {
-    type: Collection,
+    type: Artist,
     args: {
         artist: {
             name: 'artist',
@@ -23,7 +23,8 @@ export default {
         }
     },
     resolve (root, {artist, collection, collectionType = 'album'}, {database}) {
-        return database.doc(`/artists/${artist}`).get()
+        const artistReference = database.doc(`/artists/${artist}`);
+        return artistReference.get()
             .then((snapshot: QueryDocumentSnapshot) => {
                 const data = snapshot.data();
                 const reference: ReferenceUnit = {
@@ -34,7 +35,7 @@ export default {
                 };
                 return snapshot.ref.update('__ref', [...data.__ref, reference])
             })
-            .then(() => database.doc(`/collections/${collection}`).get())
+            .then(() => artistReference.get())
             .then((snapshot: QueryDocumentSnapshot) => snapshot.exists ? transformSnapshot(snapshot) : null);
     }
 };

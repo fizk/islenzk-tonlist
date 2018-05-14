@@ -21,8 +21,8 @@ export default {
             description: null,
             genres: [],
             periods: [],
-            from: new Date(),
-            to: new Date(),
+            from: null,
+            to: null,
         }, values);
 
         return database.collection('artists').add(data)

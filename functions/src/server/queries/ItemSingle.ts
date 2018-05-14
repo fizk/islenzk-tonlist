@@ -16,4 +16,3 @@ export default {
             .then((snapshot: QueryDocumentSnapshot) => snapshot.exists ? transformSnapshot(snapshot) : null);
     }
 };
-

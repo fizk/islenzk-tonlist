@@ -30,8 +30,11 @@
 }
 
 .artist-header__avatar-container {
-    border: map_get($border, width-thick) solid map_get($color, light);
     @include circle;
+
+    border: map_get($border, width-thick) solid map_get($color, light);
+    position: relative;
+    z-index: 2;
 }
 
 .artist-header__name {

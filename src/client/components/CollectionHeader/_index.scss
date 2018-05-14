@@ -22,6 +22,8 @@
 }
 
 .collection-header__avatar-container {
+    position: relative;
+    z-index: 2;
     border: map_get($border, width-thick) solid map_get($color, light);
 }
 

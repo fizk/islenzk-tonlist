@@ -1,6 +1,5 @@
 import {GraphQLString, GraphQLList, GraphQLInt, GraphQLNonNull} from "graphql";
-import Collection from '../types/Collection';
-import {CollectionType} from "../types/Collection";
+import Collection, {CollectionType} from '../types/Collection';
 
 export default {
     type: new GraphQLList(Collection),
@@ -28,6 +27,10 @@ export default {
                 },{
                     fuzzy: {
                         "aka.raw": {value: term}
+                    },
+                }, {
+                    fuzzy: {
+                        "description.raw": {value: term}
                     }
                 }
             ]

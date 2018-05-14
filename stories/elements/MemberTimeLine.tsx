@@ -311,7 +311,7 @@ const members = [
 ];
 
 storiesOf('Elements/MemberTimeLine', module)
-    .add('Empty', () => (
+    .add('default', () => (
         <MemberTimeLine artists={members} albums={albums} />
     ))
 ;

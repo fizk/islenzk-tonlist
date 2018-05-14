@@ -1,68 +1,63 @@
 import * as React from 'react';
+import {ImageType} from "../../../../@types";
+import classVariations from '../../helpers/classVariations';
 import './_index.scss';
 
 type Props = {
-    width?: number | string,
-    height?: number | string,
-    src: string,
-    base64: string,
-    className?: string,
+    src: ImageType
+    variations?: string[]
 }
 
-class Poster extends React.Component<Props> {
+export default class extends React.Component<Props> {
+
     static defaultProps = {
-        width: 60,
-        height: 60,
-        src: undefined,
-        base64: undefined,
+        src: {
+            url: undefined,
+            base64: undefined,
+        },
+        variations: [],
     };
 
-    img: any;
-
-    constructor(props) {
-        super(props);
-
-        this.img = undefined;
-
-        const imageObject = new Image();
-        imageObject.addEventListener('load', (event) => {
-            this.img.style.backgroundImage = `url(${props.src})`;
-            this.img.classList.add('poster__image--fade-in');
-        });
-        imageObject.src = props.src;
-    }
+    ironImageHd = null;
 
     componentWillReceiveProps(props) {
-        if (props.src === undefined) {
-            this.img.style.backgroundImage = 'none';
-        } else if (props.src) {
-            const imageObject = new Image();
-            imageObject.addEventListener('load', (event) => {
-                this.img.style.backgroundImage = `url(${props.src})`;
-                this.img.classList.add('posterr__image--fade-in');
-            });
-            imageObject.src = props.src;
-        }
+        const hdLoaderImg = new Image();
+        hdLoaderImg.src = props.src.url;
+        hdLoaderImg.addEventListener('load', () => {
+            this.ironImageHd.setAttribute(
+                'style',
+                `background-image: url('${props.src.url}')`
+            );
+            this.ironImageHd.classList.add('poster-image-fade-in');
+        });
     }
 
+    componentDidMount() {
+        const hdLoaderImg = new Image();
+        hdLoaderImg.src = this.props.src.url;
+        hdLoaderImg.addEventListener('load', () => {
+            this.ironImageHd.setAttribute(
+                'style',
+                `background-image: url('${this.props.src.url}')`
+            );
+            this.ironImageHd.classList.add('poster-image-fade-in');
+        });
+    };
+
     render() {
-        const containerStyle = {
-            backgroundImage: `url(${this.props.base64})`,
-            width: this.props.width,
-            height: this.props.height,
-
-        };
-        const imageStyle = {
-            width: this.props.width,
-            height: this.props.height,
-
-        };
         return (
-            <span className="poster" style={containerStyle}>
-                <div className="poster__image" style={imageStyle} ref={item => this.img = item}/>
-            </span>
-        );
+            <div className={classVariations('poster-image-container', this.props.variations)}>
+                <div
+                    className="poster-image-loaded"
+                    ref={imageLoadedElem => this.ironImageHd = imageLoadedElem}>
+                </div>
+                <div
+                    className="poster-image-preload"
+                    style={{ backgroundImage: `url('${this.props.src.base64}')` }}>
+                </div>
+            </div>
+        )
     }
 }
 
-export {Poster};
+

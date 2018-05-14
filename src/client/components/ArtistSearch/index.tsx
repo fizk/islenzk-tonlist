@@ -1,6 +1,5 @@
 import * as React from 'react';
 // import {OptionsWithKeyBinding, OptionsItem} from '../../elements/Options';
-import {Avatar} from '../../elements/Avatar';
 import {Button} from '../../elements/Form';
 
 

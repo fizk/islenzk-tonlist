@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {Fragment} from 'react';
 import * as ReactMarkdown from 'react-markdown';
-import '../../elements/MarkDownContainer/_index.scss';
 import {Grid, Column, Row} from '../../elements/Grid';
 import LoadingStrip from '../../elements/LoadingStrip';
 import ArtistHeader from '../../components/ArtistHeader';
@@ -12,17 +11,16 @@ import ArtistListItem from '../../components/ArtistListItem';
 import Paper from '../../elements/Paper';
 import MemberTimeLine from '../../elements/MemberTimeLine';
 import {ArtistType} from "../../../../@types";
-import CollectionSearch from '../../components/CollectionSearch'
-
+import CollectionSearch from '../../components/CollectionSearch';
+import '../../elements/MarkDownContainer/_index.scss';
 
 type Props = {
     id: string
     artist: ArtistType & {__typename: string},
     loading: boolean,
     edit?: boolean,
+    connectCollection?: () => void
 }
-
-
 
 export default class ArtistSection extends React.Component<Props> {
     static defaultProps = {
@@ -48,6 +46,7 @@ export default class ArtistSection extends React.Component<Props> {
         },
         loading: false,
         edit: false,
+        connectCollection: () => {}
     };
 
     render() {
@@ -62,33 +61,20 @@ export default class ArtistSection extends React.Component<Props> {
                 <Row>
                     <Column>
                         <Paper>
-                            {this.props.edit && (<CollectionSearch onSelect={console.log} />)}
+                            {this.props.edit && <CollectionSearch type="album" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.albums} />
 
-                            <ListHeader>
-                                <h3>Smáskífur</h3>
-                            </ListHeader>
-                            {this.props.edit && (
-                                <div>edit = true</div>
-                            )}
+                            <ListHeader><h3>Smáskífur</h3></ListHeader>
+                            {this.props.edit && <CollectionSearch type="single" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.singles} />
 
-                            <ListHeader>
-                                <h3>EP plötur</h3>
-                            </ListHeader>
-                            {this.props.edit && (
-                                <div>edit = true</div>
-                            )}
+                            <ListHeader><h3>EP plötur</h3></ListHeader>
+                            {this.props.edit && <CollectionSearch type="ep" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.eps} />
 
-                            <ListHeader>
-                                <h3>Safnplötur</h3>
-                            </ListHeader>
-                            {this.props.edit && (
-                                <div>edit = true</div>
-                            )}
+                            <ListHeader><h3>Safnplötur</h3></ListHeader>
+                            {this.props.edit && <CollectionSearch type="collection" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.compilations} />
-
                         </Paper>
                     </Column>
                     <Column>

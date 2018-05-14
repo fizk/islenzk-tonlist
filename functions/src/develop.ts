@@ -20,5 +20,5 @@ admin.initializeApp(
     }
 );
 
-graphQLServer(firestore, elasticSearchClient).listen(5000, '0.0.0.0', console.log);
+graphQLServer(firestore, elasticSearchClient).listen(3000, '0.0.0.0', console.log);
 

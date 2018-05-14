@@ -9,10 +9,10 @@ import {List} from '../../elements/List';
 import LoadingStrip from '../../elements/LoadingStrip';
 import PublicationTable from '../../components/PublicationTable';
 import Paper from '../../elements/Paper/index';
-import {AlbumType} from "../../../../@types";
+import {CollectionType} from "../../../../@types";
 
 type Props = {
-    album: AlbumType,
+    album: CollectionType,
     loading: boolean,
 }
 

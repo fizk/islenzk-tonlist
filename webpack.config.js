@@ -1,6 +1,7 @@
 const DefinePlugin = require('webpack').DefinePlugin;
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const DashboardPlugin = require('webpack-dashboard/plugin');
 
 module.exports = {
     name: 'jazz',
@@ -40,6 +41,7 @@ module.exports = {
         extensions: [ '.tsx', '.ts', '.js', ],
     },
     plugins: [
+        new DashboardPlugin(),
         new ExtractTextPlugin('./bundle.css'),
         new DefinePlugin({
             __API_URL__: JSON.stringify(
@@ -52,6 +54,7 @@ module.exports = {
     devServer: {
         contentBase: path.join(__dirname, 'public'),
         port: 3001,
+        hot: false,
         historyApiFallback: true,
         headers: {
             'Access-Control-Allow-Origin': '*',

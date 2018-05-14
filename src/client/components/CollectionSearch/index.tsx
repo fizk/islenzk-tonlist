@@ -1,66 +1,68 @@
 import * as React from 'react';
+import AutoCompleteCollection from "../../elements/AutoComplete/AutoCompleteCollection";
+import AutoComplete from "../../elements/AutoComplete/AutoComplete";
 import gql from "graphql-tag";
-import CollectionSearch from './CollectionSearch';
+
+type Props = {
+    type?: string
+    onSelect: (item: any) => void
+}
+
+type State = {
+    items: any[]
+}
+
+export default class CollectionSearch extends React.Component<Props, State> {
+    static defaultProps = {
+        type: 'album',
+        onSelect: (item: any) => {}
+    };
+
+    static contextTypes = {
+        client: () => {},
+    };
+
+    state = {
+        items: [],
+    };
+
+    handleSearch = (term) => {
+        this.context.client.query({
+            query: collectionSearchQuery,
+            variables: {term: term, type: this.props.type}
+        }).then(result => {
+            this.setState({
+                items: result.data.CollectionSearch
+            });
+        });
+    };
+
+    handleOnClear = () => {
+        this.setState({items: []})
+    };
+
+    render() {
+        return (
+            <AutoComplete onType={this.handleSearch} onSelect={this.props.onSelect} onClear={this.handleOnClear}>
+                {this.state.items.map(item => (
+                    <AutoCompleteCollection key={item._id} value={item}>
+                        {item.name}
+                    </AutoCompleteCollection>
+                ))}
+            </AutoComplete>
+        );
+    }
+}
+
 
 export const collectionSearchQuery = gql`
-    query searchCollection ($term: String!, $type: CollectionType) {
-        CollectionSearch(term: $term,  type: $type) {
+    query search_collection ($term: String! $type: CollectionType) {
+        CollectionSearch (term: $term type: $type) {
             _id
+            contentType {type subtype attribute}
             name
             releaseDates
-            avatar {base64 url}
-            artists {
-                ... on Person {
-                    _id
-                    name
-                }
-                ... on Group {
-                    _id
-                    name
-                }
-            }
+            avatar {base64, url}
         }
     }
 `;
-
-const CollectionSearchWithApollo = (Component) => {
-    return class extends React.Component<{onSelect: () => void}> {
-        static defaultProps = {
-            onSelect: () => {}
-        };
-
-        static contextTypes = {
-            client: () => {},
-        };
-
-        state = {
-            items: []
-        };
-
-        constructor(props, context) {
-            super(props, context);
-
-            this.handleOnType = this.handleOnType.bind(this);
-        }
-
-        handleOnType(event) {
-
-            this.context.client.query({
-                query: collectionSearchQuery,
-                variables: {term: event.target.value}
-            }).then(result => {
-                this.setState({
-                    items: result.data.CollectionSearch
-                });
-            });
-        };
-
-        render() {
-
-            return (<Component onSelect={this.props.onSelect} items={this.state.items} onType={this.handleOnType} />)
-        }
-    }
-};
-
-
-export default CollectionSearchWithApollo(CollectionSearch);

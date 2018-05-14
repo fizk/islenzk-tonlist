@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import * as admin from "firebase-admin";
 import graphQLServer from './server';
 import * as elasticsearch from 'elasticsearch';
-// import {Firestore} from '@google-cloud/firestore';
+import {Firestore} from '@google-cloud/firestore';
 import {
     createReferenceRecord,
     createSearchRecord,
@@ -12,20 +12,20 @@ import {
     deleteReferenceRecord
 } from "./utils";
 
-// const serviceAccount = require('/Users/einar.adalsteinsson/.gcloud/islensk-tonlist.json');
+const serviceAccount = require('/Users/einar.adalsteinsson/.gcloud/islensk-tonlist.json');
 
 admin.initializeApp
 (
-    // {
-    //     credential: admin.credential.cert(serviceAccount),
-    //     databaseURL: 'https://islenzktonlist.firebaseio.com'
-    // }
+    {
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: 'https://islenzktonlist.firebaseio.com'
+    }
 );
 
-// const firestore = new Firestore({
-//     projectId: 'islenzktonlist',
-//     keyFilename: '/Users/einar.adalsteinsson/.gcloud/islensk-tonlist.json',
-// });
+const firestore = new Firestore({
+    projectId: 'islenzktonlist',
+    keyFilename: '/Users/einar.adalsteinsson/.gcloud/islensk-tonlist.json',
+});
 
 const elasticSearchClient = new elasticsearch.Client({
     host: '107.170.87.126:9200',
@@ -34,7 +34,7 @@ const elasticSearchClient = new elasticsearch.Client({
 
 
 //GRAPH-QL
-export const api = functions.https.onRequest(graphQLServer(functions.firestore, elasticSearchClient));
+export const api = functions.https.onRequest(graphQLServer(firestore, elasticSearchClient));
 
 //ARTIST
 export const artistDocumentCreateSearchRecord = functions.firestore.document('artists/{id}').onCreate(createSearchRecord('it_artists', 'artist', elasticSearchClient));

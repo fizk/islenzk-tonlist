@@ -1,12 +1,12 @@
 import * as React from 'react';
 import {List, ListItemAvatar} from '../../elements/List';
 import {Link} from 'react-router-dom';
-import {Poster} from '../../elements/Poster';
+import Poster from '../../elements/Poster';
 import {Time} from '../../elements/Time';
-import {AlbumType} from "../../../../@types";
+import {CollectionType} from "../../../../@types";
 
 type Props = {
-    releases: AlbumType[],
+    releases: CollectionType[],
 }
 
 export default class ReleasesList extends React.Component<Props> {
@@ -19,7 +19,7 @@ export default class ReleasesList extends React.Component<Props> {
         return (
             <List>
                 {this.props.releases.map(release => (
-                    <ListItemAvatar key={`release-id-${release._id}`} avatar={<Poster base64={release.avatar ? release.avatar.base64 : undefined} src={release.avatar ? release.avatar.url : undefined} />}>
+                    <ListItemAvatar key={`release-id-${release._id}`} avatar={<Poster src={release.avatar === null ? undefined : release.avatar} />}>
                         <Link to={`/verk/${release._id}`}>{release.name}</Link>
                         <div>
                             {release.releaseDates && (<Time>{new Date(release.releaseDates).getFullYear()}</Time>)}
