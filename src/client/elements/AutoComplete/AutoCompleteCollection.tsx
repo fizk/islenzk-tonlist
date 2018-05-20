@@ -22,7 +22,7 @@ const AutoCompleteCollection: StatelessComponent<Props> = (
         <div className={classVariations('auto-complete-collection', active ? [...variations, 'active'] : variations)}
              onClick={() => onSelect(value)}>
             <div className="auto-complete-collection__icon">
-                <Poster src={value.avatar} variations={['sm']}/>
+                <Poster src={value.avatar === null ? undefined : value.avatar} variations={['sm']}/>
             </div>
             <div className="auto-complete-collection__content">
                 <h3 className="auto-complete-collection__title">{value.name}</h3>

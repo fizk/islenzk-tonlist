@@ -2,10 +2,13 @@
 
 
 .input {
-    border-style: none;
+    padding: map_get($space, xs) map_get($space, md);
     outline: none;
     box-sizing: border-box;
     background-color: map_get($color, light);
+
+    //border-style: none;
+    border: 1px solid rgb(200, 200, 200);
 }
 
 .input::placeholder {

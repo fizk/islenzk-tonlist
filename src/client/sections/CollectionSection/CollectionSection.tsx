@@ -10,10 +10,12 @@ import LoadingStrip from '../../elements/LoadingStrip';
 import PublicationTable from '../../components/PublicationTable';
 import Paper from '../../elements/Paper/index';
 import {CollectionType} from "../../../../@types";
+import ItemSearch from "../../components/ItemSearch";
 
 type Props = {
     album: CollectionType,
     loading: boolean,
+    connectItem?: () => void
 }
 
 export default class CollectionSection extends React.Component<Props> {
@@ -31,7 +33,8 @@ export default class CollectionSection extends React.Component<Props> {
             artists: [],
             performers: [],
             publications: [],
-        }
+        },
+        connectItem: () => {}
     };
 
     render() {
@@ -46,6 +49,7 @@ export default class CollectionSection extends React.Component<Props> {
                 <Row>
                     <Column>
                         <Paper>
+                            <ItemSearch id={this.props.album._id} type="song" onSelect={this.props.connectItem} />
                             <ItemsList items={this.props.album.songs} />
                         </Paper>
                     </Column>
@@ -55,8 +59,8 @@ export default class CollectionSection extends React.Component<Props> {
                                 <ArtistListItem key={`performer-${artist._id}`} artist={artist} />
                             ))}
                         </List>
-                        <PublicationTable publications={this.props.album.publications || []} />
                         <ReactMarkdown source={this.props.album.description || ''} />
+                        <PublicationTable publications={this.props.album.publications || []} />
                     </Column>
                 </Row>
             </Grid>

@@ -25,7 +25,7 @@ const AutoCompleteArtist: StatelessComponent<Props> = (
         <div className={classVariations('auto-complete-artist', active ? [...variations, 'active'] : variations )}
              onClick={() => onSelect(value)}>
             <div className="auto-complete-artist__icon">
-                <Avatar src={value.avatar} variations={['sm']} />
+                <Avatar src={value.avatar || undefined} variations={['sm']} />
             </div>
             <div className="auto-complete-artist__content">
                 <h3 className="auto-complete-artist__title">{value.name}</h3>

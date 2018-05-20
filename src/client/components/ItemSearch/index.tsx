@@ -1,79 +1,149 @@
 import * as React from 'react';
-// import {OptionsWithKeyBinding, OptionsItem} from '../../elements/Options';
-import {Button} from '../../elements/Form';
+import AutoCompleteCollection from "../../elements/AutoComplete/AutoCompleteCollection";
+import AutoCompleteCreateCollection from "../../elements/AutoComplete/AutoCompleteCreateCollection";
+import AutoComplete from "../../elements/AutoComplete/AutoComplete";
+import gql from "graphql-tag";
+import  * as debounce from 'throttle-debounce/debounce';
+import ApolloClient from "apollo-client/ApolloClient";
+import {FetchResult} from "apollo-link";
+import {ApolloQueryResult} from "apollo-client";
+import {collectionQuery} from '../../sections/CollectionSection';
+import './_index.scss';
 
 type Props = {
-    onCreate: (value: string) => void,
-    onSelect: (item: string) => void,
-    doSearch: (term: string) => void,
-    results: {
-        name: string,
-        _id: string,
-    }[],
-    isSearching: boolean,
+    id: string
+    type?: string
+    onSelect: (item: any) => void
 }
 
 type State = {
-    value: string
+    items: any[]
+    term: string
+    isSearching: boolean
+    isCreate: boolean
 }
 
-class ItemSearch extends React.Component<Props, State> {
-
+export default class ItemSearch extends React.Component<Props, State, {client: ApolloClient<any>}> {
     static defaultProps = {
-        onCreate: () => {},
-        onSelect: () => {},
-        doSearch: () => {},
-        results: [],
-        isSearching: false,
+        id: undefined,
+        type: 'song',
+        onSelect: (item: any) => {}
     };
 
-    constructor(props) {
-        super(props);
+    static contextTypes = {
+        client: () => {},
+    };
 
-        this.handleSearchChange = this.handleSearchChange.bind(this);
-        this.handleSearchSelect = this.handleSearchSelect.bind(this);
-        this.handleOnCreate = this.handleOnCreate.bind(this);
+    state = {
+        items: [],
+        term: undefined,
+        isSearching: false,
+        isCreate: false,
+    };
 
-        this.state = {
-            value: '',
-        };
+    constructor(props, context) {
+        super(props, context);
+
+        this.handleSearch = debounce(1000, this.handleSearch.bind(this));
+        this.handleCreateItem = this.handleCreateItem.bind(this)
     }
 
-    handleSearchChange(term) {
-        this.props.doSearch(term);
-        this.setState({value: term});
+    handleSearch(term)  {
+        if (term.length === 0) {
+            return;
+        }
+
+        this.setState({isSearching: true, term: term});
+        this.context.client.query({
+            query: itemSearchQuery,
+            variables: {term: term, type: this.props.type},
+        }).then((result: ApolloQueryResult<any>) => {
+            this.setState({
+                items: result.data.ItemSearch,
+                isSearching: false,
+                isCreate: result.data.ItemSearch.length === 0 && term.length > 4
+            });
+        });
+    };
+
+    handleCreateItem() {
+        this.handleOnClear();
+
+        this.context.client.mutate({
+            mutation: itemCreateQuery,
+            variables: {type: this.props.type, values: {name: this.state.term}},
+            // update: (store, {data: {ItemAdd}}) => {
+            //     const data = store.readQuery({query: collectionQuery, variables: {id: this.props.id}});
+            //     const stuff = {
+            //         __typename: "song",
+            //         position: null,
+            //         song : ItemAdd
+            //     };
+            //     data.Collection.songs = [...data.Collection.songs, stuff];
+            //     store.writeQuery({ query: collectionQuery, data});
+            // },
+            // optimisticResponse: {
+            //     __typename: "Mutation",
+            //     ItemAdd: {
+            //         contentType: {
+            //             attribute: null,
+            //             subtype: "song",
+            //             type: "item",
+            //             __typename: "Content"
+            //         },
+            //         name: "that's the stuff",
+            //         __typename: "Item",
+            //         _id: "temp-id",
+            //     }
+            // }
+        }).then((result: FetchResult) => {
+            this.props.onSelect(result.data.ItemAdd);
+        });
     }
 
-    handleSearchSelect(item) {
-        this.props.onSelect(item);
-    }
-
-    handleOnCreate() {
-        this.props.onCreate(this.state.value);
-    }
+    handleOnClear = () => {
+        this.setState({
+            items: [],
+            term: undefined,
+            isSearching: false,
+            isCreate: false,
+        })
+    };
 
     render() {
         return (
-            <div style={{display: 'flex', }}>
-                {/*<OptionsWithKeyBinding*/}
-                    {/*elastic={true}*/}
-                    {/*isSearching={this.props.isSearching}*/}
-                    {/*onChange={this.handleSearchChange}*/}
-                    {/*onSelect={this.handleSearchSelect}>*/}
-                    {/*{this.props.results.map(item => (*/}
-                        {/*<OptionsItem key={item._id} value={item}>*/}
-                            {/*<div style={{display: 'flex'}}>*/}
-                                {/*<div>*/}
-                                    {/*{item.name}*/}
-                                {/*</div>*/}
-                            {/*</div>*/}
-                        {/*</OptionsItem>*/}
-                    {/*))}*/}
-                {/*</OptionsWithKeyBinding>*/}
-                <Button variations={['primary']} onClick={this.handleOnCreate}>create!</Button>
-            </div>
+            <AutoComplete loading={this.state.isSearching} onType={this.handleSearch} onSelect={this.props.onSelect} onClear={this.handleOnClear}>
+                {this.state.items.map(item => (
+                    <AutoCompleteCollection key={item._id} value={item} />
+                ))}
+                {this.state.isCreate && (
+                    <AutoCompleteCreateCollection onCreate={this.handleCreateItem} />
+                )}
+            </AutoComplete>
         );
     }
 }
 
-export {ItemSearch, ItemSearch as ItemSearchWithState};
+export const itemSearchQuery = gql`
+    query item_search ($term: String!) {
+        ItemSearch(term: $term) {
+            __typename
+            _id
+            name
+            duration
+            contentType {attribute subtype type}
+        }
+    }
+`;
+
+export const itemCreateQuery = gql`
+    mutation create_item ($type: ItemType!, $values: ItemInput!) {
+        ItemAdd (type: $type, values: $values) {
+            __typename
+            _id
+            name
+            duration
+            contentType {attribute subtype type}
+        }
+    }
+`;

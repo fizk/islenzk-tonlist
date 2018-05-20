@@ -4,7 +4,7 @@ import ReleasesList from '../../components/ReleasesList';
 import ArtistListItem from '../../components/ArtistListItem';
 import {List} from '../../elements/List';
 import {Time} from '../../elements/Time';
-import {ArtistSearchWithState} from '../../components/ArtistSearch';
+// import {ArtistSearchWithState} from '../../components/ArtistSearch';
 import {ListFooter} from '../../elements/List';
 import Paper from '../../elements/Paper';
 import {ItemType} from "../../../../@types";

@@ -1,5 +1,5 @@
 import {GraphQLString, GraphQLList, GraphQLInt, GraphQLNonNull} from "graphql";
-import Artist from '../types/Artist';
+import Artist, {ArtistType} from '../types/Artist';
 
 export default {
     type: new GraphQLList(Artist),
@@ -7,6 +7,9 @@ export default {
         term: {
             name: 'term',
             type: new GraphQLNonNull(GraphQLString),
+        },
+        type: {
+            type: ArtistType
         },
         limit: {
             name: 'limit',
@@ -19,18 +22,10 @@ export default {
             body: {
                 query: {
                     bool: {
-                        should: [
+                        must: [
                             {
                                 fuzzy: {
-                                    "name.raw": {value: term, boost: 1}
-                                }
-                            },{
-                                fuzzy: {
-                                    "aka.raw": {value: term, boost: 1}
-                                }
-                            },{
-                                fuzzy: {
-                                    "description.raw": {value: term}
+                                    "name": {value: term, boost: 1}
                                 }
                             }
                         ]

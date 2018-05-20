@@ -3,6 +3,7 @@ import {storiesOf, addDecorator} from '@storybook/react';
 import {action} from '@storybook/addon-actions';
 import AutoComplete from '../../src/client/elements/AutoComplete/AutoComplete';
 import AutoCompleteCollection from '../../src/client/elements/AutoComplete/AutoCompleteCollection';
+import AutoCompleteCreateCollection from '../../src/client/elements/AutoComplete/AutoCompleteCreateCollection';
 import AutoCompleteArtist from '../../src/client/elements/AutoComplete/AutoCompleteArtist';
 import {withKnobs, boolean} from '@storybook/addon-knobs/react';
 import {ArtistType, CollectionType} from "../../@types";
@@ -73,6 +74,7 @@ storiesOf('Elements/AutoComplete', module).addDecorator(withKnobs)
                 {collections.map(item => (
                     <AutoCompleteCollection key={item._id} value={item} />
                 ))}
+                <AutoCompleteCreateCollection />
             </AutoComplete>
         );
     })

@@ -68,8 +68,8 @@ export const ListGenres: StatelessComponent<{genres: GenreType[]}> = ({genres = 
 export const ListPeriods: StatelessComponent<{periods: PeriodType[]}> = ({periods = []}) => (
     <List>
         {periods.map((period, i) => (
-            <li key={`periods-${period.from.toString()}-${period.to.toString()}-${i}`}>
-                <time>{new Date(period.from).getFullYear()}</time> - <time>{new Date(period.to).getFullYear()}</time>
+            <li key={`periods-${i}`}>
+                <time>{period.from && new Date(period.from).getFullYear()}</time> - <time>{period.to && new Date(period.to).getFullYear()}</time>
             </li>
         ))}
     </List>

@@ -3,7 +3,7 @@ import {graphql, compose} from 'react-apollo';
 import gql from 'graphql-tag';
 import ArtistSection from './ArtistSection';
 
-const artistQuery = gql`
+export const artistQuery = gql`
     fragment collection on Collection {
         _id
         name
@@ -97,7 +97,7 @@ const artistQuery = gql`
     }
 `;
 
-const associationAddPeriodMutation = gql`
+const artistAddCollection = gql`
     fragment collection on Collection {
         _id
         name
@@ -124,8 +124,40 @@ const associationAddPeriodMutation = gql`
         }
     }`;
 
+const artistAddMember = gql`
+    mutation artist_add_member ($artist: ID!, $member: ID!) {
+        ArtistAddMember(artist: $artist, member: $member) {
+            periods {from to}
+            artist {
+                _id
+                name
+                avatar {base64 url}
+            }
+            uuid
+        }
+    }
+`;
+
 export default compose(
-    graphql(associationAddPeriodMutation, {
+    graphql(artistAddMember, {
+        props: ({mutate, ownProps}: {mutate: any, ownProps: any}) => ({
+            connectMember: (vars) => {
+                mutate({
+                    variables: {
+                        artist: ownProps.id,
+                        member: vars._id,
+                        collectionType: vars.contentType.attribute ? vars.contentType.attribute : 'member'
+                    },
+                    update: (store, {data: {ArtistAddMember}}) => {
+                        const data = store.readQuery({query: artistQuery, variables: {id: ownProps.id}});
+                        data.Artist.members.push(ArtistAddMember);
+                        store.writeQuery({ query: artistQuery, data, });
+                    },
+                })
+            },
+        }),
+    }),
+    graphql(artistAddCollection, {
         props: ({mutate, ownProps}: {mutate: any, ownProps: any}) => ({
             connectCollection: (vars) => {
                 mutate({

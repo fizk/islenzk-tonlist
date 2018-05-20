@@ -1,5 +1,7 @@
 import * as React from 'react';
 import classVariations from '../../helpers/classVariations';
+import {StatelessComponent} from "react";
+import './_textarea.scss';
 
 const Textarea = props => {
     const {variations, ...rest} = props;
@@ -7,3 +9,14 @@ const Textarea = props => {
 };
 
 export {Textarea};
+
+type Props = {
+    variations?: string[]
+}
+
+const TextArea: StatelessComponent<Props> = ({variations = [], ...rest}) => (
+    <textarea className={classVariations('textarea', variations)} {...rest} />
+);
+
+
+export default TextArea

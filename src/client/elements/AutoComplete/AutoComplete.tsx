@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import classVariations from '../../helpers/classVariations'
+import classVariations from '../../helpers/classVariations';
 import './_auto-complete.scss'
 
 const mod = (n, m) => {
@@ -17,6 +17,7 @@ type Props = {
 type State = {
     index: number
     counter: number
+    value: string
 }
 
 export default class AutoComplete extends React.Component<Props, State> {
@@ -30,6 +31,7 @@ export default class AutoComplete extends React.Component<Props, State> {
     state = {
         index: 0,
         counter: 0,
+        value: ''
     };
 
     mounted: boolean = false;
@@ -37,8 +39,10 @@ export default class AutoComplete extends React.Component<Props, State> {
     constructor(props) {
         super(props);
         this.mounted = true;
+
         this.handleDocumentClick = this.handleDocumentClick.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
+        this.handleInput = this.handleInput.bind(this);
 
         this.handleInitialState(props)
     }
@@ -48,7 +52,7 @@ export default class AutoComplete extends React.Component<Props, State> {
     }
 
     handleInitialState = (props) => {
-        if (props.children.length > 0) {
+        if (React.Children.toArray(props.children).length > 0) {
             document.addEventListener('click', this.handleDocumentClick, false);
             document.addEventListener('touchend', this.handleDocumentClick, false);
             document.addEventListener('keyup', this.handleKeyUp, false);
@@ -68,10 +72,21 @@ export default class AutoComplete extends React.Component<Props, State> {
     handleDocumentClick (event) {
         if (this.mounted) {
             if (!ReactDOM.findDOMNode(this).contains(event.target)) {
-                console.log('outside');
                 this.props.onClear();
+                this.setState({
+                    counter: 0,
+                    index: 0,
+                    value: '',
+                });
             }
         }
+    }
+
+    handleInput(event) {
+        this.setState({
+            value: (event.target as HTMLInputElement).value
+        });
+        this.props.onType((event.target as HTMLInputElement).value);
     }
 
     handleKeyUp (event) {
@@ -97,6 +112,7 @@ export default class AutoComplete extends React.Component<Props, State> {
                     this.setState({
                         counter: 0,
                         index: 0,
+                        value: '',
                     });
                     break;
                 case 'Enter':
@@ -104,6 +120,7 @@ export default class AutoComplete extends React.Component<Props, State> {
                     this.setState({
                         counter: 0,
                         index: 0,
+                        value: '',
                     });
                     break;
             }
@@ -114,11 +131,12 @@ export default class AutoComplete extends React.Component<Props, State> {
         return (
             <div className={classVariations('auto-complete', this.props.loading ? ['loading'] : [])}>
                 <input className="auto-complete__input"
-                       onKeyUp={(event) => this.props.onType((event.target as HTMLInputElement).value)}/>
+                       onChange={this.handleInput}
+                       value={this.state.value}/>
                 {React.Children.count(this.props.children) > 0 && (
                     <div className="auto-complete__drop-down">
                         {React.Children.map(this.props.children, (child: any, i: number) => {
-                            return React.cloneElement(child, {
+                            return child && React.cloneElement(child, {
                                 onSelect: this.props.onSelect,
                                 active: i === this.state.index,
                             });

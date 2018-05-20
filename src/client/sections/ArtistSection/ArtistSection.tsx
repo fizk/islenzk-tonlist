@@ -13,6 +13,7 @@ import MemberTimeLine from '../../elements/MemberTimeLine';
 import {ArtistType} from "../../../../@types";
 import CollectionSearch from '../../components/CollectionSearch';
 import '../../elements/MarkDownContainer/_index.scss';
+import ArtistSearch from "../../components/ArtistSearch";
 
 type Props = {
     id: string
@@ -20,6 +21,7 @@ type Props = {
     loading: boolean,
     edit?: boolean,
     connectCollection?: () => void
+    connectMember?: () => void
 }
 
 export default class ArtistSection extends React.Component<Props> {
@@ -46,7 +48,8 @@ export default class ArtistSection extends React.Component<Props> {
         },
         loading: false,
         edit: false,
-        connectCollection: () => {}
+        connectCollection: () => {},
+        connectMember: () => {},
     };
 
     render() {
@@ -61,19 +64,19 @@ export default class ArtistSection extends React.Component<Props> {
                 <Row>
                     <Column>
                         <Paper>
-                            {this.props.edit && <CollectionSearch type="album" onSelect={this.props.connectCollection} />}
+                            {this.props.edit && <CollectionSearch id={this.props.id} type="album" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.albums} />
 
                             <ListHeader><h3>Smáskífur</h3></ListHeader>
-                            {this.props.edit && <CollectionSearch type="single" onSelect={this.props.connectCollection} />}
+                            {this.props.edit && <CollectionSearch id={this.props.id}  type="single" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.singles} />
 
                             <ListHeader><h3>EP plötur</h3></ListHeader>
-                            {this.props.edit && <CollectionSearch type="ep" onSelect={this.props.connectCollection} />}
+                            {this.props.edit && <CollectionSearch id={this.props.id}  type="ep" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.eps} />
 
                             <ListHeader><h3>Safnplötur</h3></ListHeader>
-                            {this.props.edit && <CollectionSearch type="collection" onSelect={this.props.connectCollection} />}
+                            {this.props.edit && <CollectionSearch id={this.props.id}  type="compilation" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.compilations} />
                         </Paper>
                     </Column>
@@ -93,6 +96,7 @@ export default class ArtistSection extends React.Component<Props> {
                                 ),
                                 'Group': (
                                     <Fragment>
+                                        <ArtistSearch type="person" onSelect={this.props.connectMember} />
                                         {(this.props.artist.members || []).map(artist => (
                                             <ArtistListItem key={`artist-${artist.artist._id}`} artist={artist.artist}>
                                                 {artist.periods.map((period, i) => (
@@ -104,7 +108,6 @@ export default class ArtistSection extends React.Component<Props> {
                                 ),
                             }[this.props.artist.__typename]}
                         </List>
-
 
                         <ListHeader>
                             <h3>Um {this.props.artist.name}</h3>

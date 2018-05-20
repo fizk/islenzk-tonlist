@@ -39,7 +39,8 @@
     "react-dom": "^16.2.0",
     "react-image-crop": "^3.0.11",
     "react-markdown": "^3.3.0",
-    "react-router-dom": "^4.2.2"
+    "react-router-dom": "^4.2.2",
+    "throttle-debounce": "^1.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.42",

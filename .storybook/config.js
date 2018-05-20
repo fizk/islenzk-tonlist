@@ -6,6 +6,7 @@ function loadStories() {
     require('../stories/sections/ArtistSection.tsx');
     require('../stories/sections/CollectionSection.tsx');
     require('../stories/sections/ItemSection.tsx');
+    require('../stories/components/ArtistForm.tsx');
     require('../stories/elements/MemberTimeLine.tsx');
     require('../stories/elements/AutoComplete.tsx');
     require('../stories/elements/Image.tsx');

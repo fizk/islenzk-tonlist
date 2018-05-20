@@ -19,6 +19,27 @@ import GraphQLDateTime from "./GraphQLDateTime";
 import GraphQLUUID from 'graphql-tools-type-uuid';
 import {transformSnapshot} from "../utils/transform";
 
+export const GroupMember = new GraphQLObjectType({
+    name: 'GroupMember',
+    fields: () => ({
+        periods: {
+            type: new GraphQLList(Period),
+            resolve(root) {
+                return root.period || []
+            },
+        },
+        artist: {
+            name: 'Person',
+            type: Person,
+            resolve: (root: ReferenceUnit) => root._id.get().then(transformSnapshot)
+        },
+        uuid: {
+            type: new GraphQLNonNull(GraphQLUUID),
+            resolve: (root: ReferenceUnit) => root.__uuid
+        }
+    })
+});
+
 const Group = new GraphQLObjectType({
     name: 'Group',
     description: 'A single Group (or artists)',
@@ -127,27 +148,8 @@ const Group = new GraphQLObjectType({
         },
         members: {
             name: 'members',
-            type: new GraphQLList(new GraphQLObjectType({
-                name: 'members',
-                fields: () => ({
-                    periods: {
-                        type: new GraphQLList(Period),
-                        resolve(root) {
-                            return root.period || []
-                        },
-                    },
-                    artist: {
-                        name: 'Person',
-                        type: Person,
-                        resolve: (root: ReferenceUnit) => root._id.get().then(transformSnapshot)
-                    },
-                    uuid: {
-                        type: new GraphQLNonNull(GraphQLUUID),
-                        resolve: (root: ReferenceUnit) => root.__uuid
-                    }
-                })
-            })),
-            resolve(root: Reference) {
+            type: new GraphQLList(GroupMember),
+            resolve: (root: Reference) => {
                 return root.__ref.filter(item => item.__contentType === 'artist/person+member');
             },
         },
@@ -181,4 +183,3 @@ const Group = new GraphQLObjectType({
 });
 
 export default Group;
-

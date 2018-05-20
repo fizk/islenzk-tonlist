@@ -1,13 +1,12 @@
 import {GraphQLList, GraphQLID, GraphQLNonNull} from 'graphql';
-import Artist from '../types/Artist'
+import {GroupMember} from '../types/Group';
 import * as uuid from 'uuid/v4';
 import {QueryDocumentSnapshot} from "@google-cloud/firestore";
-import {transformSnapshot} from "../utils/transform";
 import {PeriodTypeInput} from "../types/Period";
 import {ReferenceUnit} from "../../@types";
 
 export default {
-    type: Artist,
+    type: GroupMember,
     args: {
         artist: {
             name: 'artist',
@@ -36,10 +35,8 @@ export default {
                         to: new Date(item.to)
                     }))
                 };
-                return snapshot.ref.update('__ref', [...data.__ref, reference])
-            })
-            .then(() => database.doc(`/artists/${artist}`).get())
-            .then((snapshot: QueryDocumentSnapshot) => snapshot.exists ? transformSnapshot(snapshot) : null);
+                return snapshot.ref.update('__ref', [...data.__ref, reference]).then(() => reference)
+            });
 
     }
 };
