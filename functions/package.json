@@ -35,6 +35,14 @@
     "typescript": "^2.5.3"
   },
   "jest": {
+    "collectCoverage": false,
+    "collectCoverageFrom": [
+      "**/*.{ts,tsx}",
+      "!**/node_modules/**",
+      "!**/vendor/**",
+      "!**/@types/**"
+    ],
+    "coverageReporters": ["json", "lcov", "text", "text-summary"],
     "roots": [
       "<rootDir>/src"
     ],

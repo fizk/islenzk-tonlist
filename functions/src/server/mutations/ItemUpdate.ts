@@ -15,7 +15,8 @@ export default {
     resolve (root, {values, item}, {database,}) {
         const document = database.doc(`item/${item}`);
 
-        return document.update(Object.assign({}, values)).then(() => document.get())
+        return document.update(Object.assign({}, values))
+            .then(() => document.get())
             .then(transformSnapshot);
     }
 };

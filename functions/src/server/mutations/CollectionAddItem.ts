@@ -1,5 +1,5 @@
 import {GraphQLID, GraphQLNonNull, GraphQLInt, GraphQLString} from 'graphql';
-import * as uuid from 'uuid/v4';
+import uuid from 'uuid/v4';
 import {QueryDocumentSnapshot} from "@google-cloud/firestore";
 import {transformSnapshot} from "../utils/transform";
 import {ReferenceUnit} from "../../@types";
@@ -18,15 +18,16 @@ export default {
         type: {
             type: new GraphQLNonNull(ItemType),
         },
-        order: {
+        position: {
             type: GraphQLInt
         },
         orderLabel: {
             type: GraphQLString
         }
     },
-    resolve (root, {collection, item, type, order = 0}, {database}) {
-        return database.doc(`collections/${collection}`).get()
+    resolve (root, {collection, item, type, position = 0}, {database}) {
+        const document = database.doc(`collections/${collection}`);
+        return document.get()
             .then((snapshot: QueryDocumentSnapshot) => {
                 const data = snapshot.data();
                 const reference: ReferenceUnit = {
@@ -34,11 +35,11 @@ export default {
                     _id: database.doc(`items/${item}`),
                     __created: new Date(),
                     __uuid: uuid(),
-                    order: order
+                    position: position
                 };
                 return snapshot.ref.update('__ref', [...data.__ref, reference])
             })
-            .then(() => database.doc(`collections/${collection}`).get())
+            .then(() => document.get())
             .then((snapshot: QueryDocumentSnapshot) => snapshot.exists ? transformSnapshot(snapshot) : null);
 
     }

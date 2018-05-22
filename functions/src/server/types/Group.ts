@@ -94,7 +94,8 @@ const Group = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map(transformSnapshot)
+                    items.filter(items => items.exists)
+                        .map(transformSnapshot)
                         .filter(item => item !== null)
                         .slice()
                         .sort(orderAlbumType)
@@ -109,11 +110,13 @@ const Group = new GraphQLObjectType({
                     .filter((item:ReferenceUnit) => item.__contentType === 'collection/album+compilation')
                     .map(item => item._id.get());
 
-                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => {
-                    return items.map(transformSnapshot)
+                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
+                    items.filter(items => items.exists)
+                        .map(transformSnapshot)
+                        .filter(item => item !== null)
                         .slice()
                         .sort(orderAlbumType)
-                });
+                ));
             }
         },
         eps: {
@@ -124,11 +127,13 @@ const Group = new GraphQLObjectType({
                     .filter((item:ReferenceUnit) => item.__contentType === 'collection/album+ep')
                     .map(item => item._id.get());
 
-                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => {
-                    return items.map(transformSnapshot)
+                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
+                    items.filter(items => items.exists)
+                        .map(transformSnapshot)
+                        .filter(item => item !== null)
                         .slice()
                         .sort(orderAlbumType)
-                });
+                ));
             }
         },
         singles: {
@@ -140,7 +145,9 @@ const Group = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map(transformSnapshot)
+                    items.filter(items => items.exists)
+                        .map(transformSnapshot)
+                        .filter(item => item !== null)
                         .slice()
                         .sort(orderAlbumType)
                 ));

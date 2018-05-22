@@ -53,3 +53,14 @@ export interface AlbumType extends Unit {
     to: Date
     contentType: ContentType
 }
+
+
+
+declare global {
+    namespace jest {
+        // tslint:disable-next-line:interface-name
+        interface Matchers<R> {
+            toMatchShapeOf(expected: any): R
+        }
+    }
+}

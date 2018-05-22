@@ -15,7 +15,8 @@ export default {
     resolve (root, {values, artist}, {database,}) {
         const document = database.doc(`collections/${artist}`);
 
-        return document.update(Object.assign({}, values)).then(() => document.get())
+        return document.update(Object.assign({}, values))
+            .then(() => document.get())
             .then(transformSnapshot);
     }
 };

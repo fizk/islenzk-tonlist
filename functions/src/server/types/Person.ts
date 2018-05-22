@@ -75,7 +75,8 @@ const Person = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map(transformSnapshot)
+                    items.filter(items => items.exists)
+                        .map(transformSnapshot)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -90,7 +91,8 @@ const Person = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map(transformSnapshot)
+                    items.filter(items => items.exists)
+                        .map(transformSnapshot)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -105,7 +107,8 @@ const Person = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map(transformSnapshot)
+                    items.filter(items => items.exists)
+                        .map(transformSnapshot)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -120,7 +123,8 @@ const Person = new GraphQLObjectType({
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.map(transformSnapshot)
+                    items.filter(items => items.exists)
+                        .map(transformSnapshot)
                         .slice()
                         .sort(orderAlbumType)
                 ));
