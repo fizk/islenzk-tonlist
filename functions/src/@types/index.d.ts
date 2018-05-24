@@ -12,7 +12,7 @@ type UUID = string;
 declare namespace DatabaseTypes {
 
     export interface ReferenceUnit {
-        _id: admin.firestore.DocumentReference & Snapshot<any>
+        _id: admin.firestore.DocumentReference | Snapshot<any>
         __created?: Date
         __uuid: UUID
         __contentType: string
@@ -121,8 +121,8 @@ declare namespace GraphQLTypes {
         aka?: string[]
         from?: Date
         to?: Date
-        albums?: Collection[]
-        periods?: PeriodType[]
+        albums?: {uuid: string, collection: Collection}[]
+        periods?: {uuid: string, collection: Collection}[]
         avatar?: ImageType
         hero?: ImageType
     }

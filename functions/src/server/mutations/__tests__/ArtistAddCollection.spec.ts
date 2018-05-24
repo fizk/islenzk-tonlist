@@ -36,9 +36,13 @@ describe('ArtistAddCollection', () => {
                   _id
                   name
                   albums {
-                    __typename
-                    _id
-                    name
+                    uuid
+                    collection {
+                        __typename
+                        _id
+                        name
+                    }
+                    
                   }
                 }
               }
@@ -51,16 +55,21 @@ describe('ArtistAddCollection', () => {
                     __typename: 'Person',
                     _id: '1',
                     name: 'Artist Name',
-                    albums: [{
-                        __typename: 'Collection',
-                        _id: '2',
-                        name: 'Collection Name',
-                    }]
+                    albums: [
+                        {
+                            uuid: '1234',
+                            collection: {
+                                __typename: 'Collection',
+                                _id: '2',
+                                name: 'Collection Name',
+                            }
+                        },
+                    ]
                 }
             }
         };
         const actual = await graphql(schema, query, {}, {database});
-        expect(actual).toEqual(expected);
+        expect(actual).toMatchShapeOf(expected);
         expect(actual.errors).toBeUndefined();
     });
 
@@ -73,8 +82,11 @@ describe('ArtistAddCollection', () => {
                   _id
                   name
                   albums {
-                    _id
-                    name
+                    uuid
+                    collection {
+                        _id
+                        name
+                    }
                   }
                 }
               }
@@ -90,38 +102,6 @@ describe('ArtistAddCollection', () => {
 
         expect(actual.data).toEqual(expected.data);
         expect(actual.errors).toBeInstanceOf(Array)
-    });
-
-    test('collection not found', async () => {
-        const query = `
-            mutation artist_add_collection {
-              ArtistAddCollection (artist: "1", collection: "invalid-id", collectionType: album) {
-                __typename
-                ... on Person {
-                  _id
-                  name
-                  albums {
-                    _id
-                    name
-                  }
-                }
-              }
-            }
-        `;
-
-        const expected: {data: {ArtistAddCollection: GraphQLTypes.Artist}} = {
-            data: {
-                ArtistAddCollection: {
-                    __typename: 'Person',
-                    _id: '1',
-                    name: 'Artist Name',
-                    albums: []
-                }
-            }
-        };
-        const actual = await graphql(schema, query, {}, {database});
-        expect(actual.data).toEqual(expected.data);
-        expect(actual.errors).toBeUndefined();
     });
 });
 
