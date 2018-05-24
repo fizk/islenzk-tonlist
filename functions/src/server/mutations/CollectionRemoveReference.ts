@@ -2,7 +2,7 @@ import {GraphQLID, GraphQLNonNull} from 'graphql';
 import {QueryDocumentSnapshot} from "@google-cloud/firestore";
 import {transformSnapshot} from "../utils/transform";
 import Artist from "../types/Artist";
-import GraphQLUUID from 'graphql-tools-type-uuid';
+import GraphQLUUID from '../types/GraphQLUUID';
 import {DatabaseTypes as D} from "../../@types";
 
 export default {
