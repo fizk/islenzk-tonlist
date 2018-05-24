@@ -4,7 +4,11 @@ import {Snapshot} from "../server/utils/database";
 type ID = string;
 type UUID = string;
 
-
+/**
+ * Database types are the shapes that are stored in
+ * the Firestore database.
+ *
+ */
 declare namespace DatabaseTypes {
 
     export interface ReferenceUnit {
@@ -68,6 +72,11 @@ declare namespace DatabaseTypes {
     }
 }
 
+/**
+ * GraphQL types are the shapes that the GraphQL server
+ * returns
+ * 
+ */
 declare namespace GraphQLTypes {
 
     export interface UnitType {
