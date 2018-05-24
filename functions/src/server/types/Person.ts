@@ -17,7 +17,7 @@ import {splitContentType, splitGenre} from "../utils/split";
 import {orderAlbumType} from "../utils/order";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";
-import GraphQLUUID from 'graphql-tools-type-uuid';
+import GraphQLUUID from './GraphQLUUID';
 import {transformSnapshot} from "../utils/transform";
 
 const Person = new GraphQLObjectType({

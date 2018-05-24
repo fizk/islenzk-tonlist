@@ -75,7 +75,7 @@ declare namespace DatabaseTypes {
 /**
  * GraphQL types are the shapes that the GraphQL server
  * returns
- * 
+ *
  */
 declare namespace GraphQLTypes {
 

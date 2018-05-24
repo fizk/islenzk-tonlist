@@ -16,7 +16,7 @@ import {DatabaseTypes as D} from "../../@types";
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";
-import GraphQLUUID from 'graphql-tools-type-uuid';
+import GraphQLUUID from './GraphQLUUID';
 import {transformSnapshot} from "../utils/transform";
 
 export const GroupMember = new GraphQLObjectType({
