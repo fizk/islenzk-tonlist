@@ -2,7 +2,7 @@ import {GraphQLID, GraphQLNonNull} from 'graphql';
 import {CollectionType} from '../types/Collection'
 import {QueryDocumentSnapshot} from "@google-cloud/firestore";
 import {DatabaseTypes as D} from "../../@types";
-import uuid from 'uuid/v4';
+import {v4 as uuid} from 'uuid';
 import {transformSnapshot} from "../utils/transform";
 import Artist from "../types/Artist";
 

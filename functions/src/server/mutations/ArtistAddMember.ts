@@ -1,6 +1,6 @@
 import {GraphQLList, GraphQLID, GraphQLNonNull} from 'graphql';
 import {GroupMember} from '../types/Group';
-import uuid from 'uuid/v4';
+import {v4 as uuid} from 'uuid';
 import {QueryDocumentSnapshot} from "@google-cloud/firestore";
 import {PeriodTypeInput} from "../types/Period";
 import {DatabaseTypes as D} from "../../@types";
