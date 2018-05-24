@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {Fragment} from 'react';
 import * as ReactMarkdown from 'react-markdown';
-import '../../elements/MarkDownContainer/_index.scss';
 import {Grid, Column, Row} from '../../elements/Grid';
 import LoadingStrip from '../../elements/LoadingStrip';
 import ArtistHeader from '../../components/ArtistHeader';
@@ -12,17 +11,18 @@ import ArtistListItem from '../../components/ArtistListItem';
 import Paper from '../../elements/Paper';
 import MemberTimeLine from '../../elements/MemberTimeLine';
 import {ArtistType} from "../../../../@types";
-import CollectionSearch from '../../components/CollectionSearch'
-
+import CollectionSearch from '../../components/CollectionSearch';
+import '../../elements/MarkDownContainer/_index.scss';
+import ArtistSearch from "../../components/ArtistSearch";
 
 type Props = {
     id: string
     artist: ArtistType & {__typename: string},
     loading: boolean,
     edit?: boolean,
+    connectCollection?: () => void
+    connectMember?: () => void
 }
-
-
 
 export default class ArtistSection extends React.Component<Props> {
     static defaultProps = {
@@ -48,6 +48,8 @@ export default class ArtistSection extends React.Component<Props> {
         },
         loading: false,
         edit: false,
+        connectCollection: () => {},
+        connectMember: () => {},
     };
 
     render() {
@@ -62,33 +64,20 @@ export default class ArtistSection extends React.Component<Props> {
                 <Row>
                     <Column>
                         <Paper>
-                            {this.props.edit && (<CollectionSearch onSelect={console.log} />)}
+                            {this.props.edit && <CollectionSearch id={this.props.id} type="album" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.albums} />
 
-                            <ListHeader>
-                                <h3>Smáskífur</h3>
-                            </ListHeader>
-                            {this.props.edit && (
-                                <div>edit = true</div>
-                            )}
+                            <ListHeader><h3>Smáskífur</h3></ListHeader>
+                            {this.props.edit && <CollectionSearch id={this.props.id}  type="single" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.singles} />
 
-                            <ListHeader>
-                                <h3>EP plötur</h3>
-                            </ListHeader>
-                            {this.props.edit && (
-                                <div>edit = true</div>
-                            )}
+                            <ListHeader><h3>EP plötur</h3></ListHeader>
+                            {this.props.edit && <CollectionSearch id={this.props.id}  type="ep" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.eps} />
 
-                            <ListHeader>
-                                <h3>Safnplötur</h3>
-                            </ListHeader>
-                            {this.props.edit && (
-                                <div>edit = true</div>
-                            )}
+                            <ListHeader><h3>Safnplötur</h3></ListHeader>
+                            {this.props.edit && <CollectionSearch id={this.props.id}  type="compilation" onSelect={this.props.connectCollection} />}
                             <ReleasesList releases={this.props.artist.compilations} />
-
                         </Paper>
                     </Column>
                     <Column>
@@ -107,6 +96,7 @@ export default class ArtistSection extends React.Component<Props> {
                                 ),
                                 'Group': (
                                     <Fragment>
+                                        <ArtistSearch type="person" onSelect={this.props.connectMember} />
                                         {(this.props.artist.members || []).map(artist => (
                                             <ArtistListItem key={`artist-${artist.artist._id}`} artist={artist.artist}>
                                                 {artist.periods.map((period, i) => (
@@ -118,7 +108,6 @@ export default class ArtistSection extends React.Component<Props> {
                                 ),
                             }[this.props.artist.__typename]}
                         </List>
-
 
                         <ListHeader>
                             <h3>Um {this.props.artist.name}</h3>

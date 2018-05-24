@@ -1,11 +1,11 @@
 import assert from 'assert';
-import {ReferenceUnit} from "../@types";
+import {DatabaseTypes} from "../@types";
 
 /**
  * Compare two ReferenceUnit items.
  *
- * @param {ReferenceUnit} one
- * @param {ReferenceUnit} two
+ * @param {DatabaseTypes.ReferenceUnit} one
+ * @param {DatabaseTypes.ReferenceUnit} two
  * @return {boolean}
  */
 const equal = (
@@ -36,12 +36,12 @@ const equal = (
  * @return {added: ReferenceUnits[]; updated: ReferenceUnits[]; deleted: ReferenceUnits[]}
  */
 export const refDifference = (one, two): {added: any[], updated: any[], deleted: any[]} => {
-    const beforeObject = one.reduce((collection, item: ReferenceUnit) => {
+    const beforeObject = one.reduce((collection, item: DatabaseTypes.ReferenceUnit) => {
         collection[item.__uuid] = {before: item, after: null};
         return collection;
     }, {});
 
-    const allObject = two.reduce((collection, item: ReferenceUnit) => {
+    const allObject = two.reduce((collection, item: DatabaseTypes.ReferenceUnit) => {
         if (collection.hasOwnProperty(item.__uuid)) {
             collection[item.__uuid].after = item
         } else {

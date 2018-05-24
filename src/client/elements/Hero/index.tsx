@@ -1,4 +1,6 @@
 import * as React from 'react';
+import {ImageType} from "../../../../@types";
+import classVariations from "../../helpers/classVariations";
 import './_index.scss';
 
 type Props = {
@@ -8,7 +10,7 @@ type Props = {
     height?: string | number
 }
 
-class Hero extends React.Component<Props> {
+export class Hero extends React.Component<Props> {
     img : any;
 
     static defaultProps = {
@@ -54,4 +56,62 @@ class Hero extends React.Component<Props> {
     }
 }
 
-export {Hero};
+
+type HeroProps = {
+    src: ImageType
+    variations?: string[]
+}
+
+export default class extends React.Component<HeroProps> {
+    ironImageHd = null;
+
+    static defaultProps = {
+        src: {
+            url: undefined,
+            base64: undefined,
+        },
+        variations: [],
+    };
+
+    componentWillReceiveProps(props) {
+
+        const hdLoaderImg = new Image();
+
+        hdLoaderImg.src = props.src.url;
+
+        hdLoaderImg.addEventListener('load', () => {
+            this.ironImageHd.setAttribute(
+                'style',
+                `background-image: url('${props.src.url}')`
+            );
+            this.ironImageHd.classList.add('hero-image-fade-in');
+        });
+    }
+
+    componentDidMount() {
+        const hdLoaderImg = new Image();
+
+        hdLoaderImg.src = this.props.src.url;
+
+        hdLoaderImg.addEventListener('load', () => {
+            this.ironImageHd.setAttribute(
+                'style',
+                `background-image: url('${this.props.src.url}')`
+            );
+            this.ironImageHd.classList.add('hero-image-fade-in');
+        });
+    };
+
+    render() {
+        return (
+            <div className={classVariations('hero-image-container', this.props.variations)}>
+                <div className="hero-image-loaded"
+                    ref={imageLoadedElem => this.ironImageHd = imageLoadedElem}>
+                </div>
+                <div className="hero-image-preload"
+                    style={{ backgroundImage: `url('${this.props.src.base64}')` }}>
+                </div>
+            </div>
+        )
+    }
+}

@@ -2,11 +2,11 @@ import * as React from 'react';
 import {scaleTime} from 'd3-scale';
 import {timeYear} from 'd3-time';
 import {validDate} from '../../helpers/date'
-import {AlbumType, ArtistType, PeriodType} from "../../../../@types";
+import {ArtistType, CollectionType, PeriodType} from "../../../../@types";
 import './_index.scss';
 
 type Props = {
-    albums: AlbumType[],
+    albums: CollectionType[],
     artists: {
         artist: ArtistType,
         periods: PeriodType[],

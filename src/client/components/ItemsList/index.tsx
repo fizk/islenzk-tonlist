@@ -2,12 +2,12 @@ import * as React from 'react';
 import {List, ListItemNumbered} from '../../elements/List';
 import {Link} from 'react-router-dom';
 import {Time} from "../../elements/Time";
-import {SongType} from "../../../../@types";
+import {ItemType} from "../../../../@types";
 
 type Props = {
     items: {
         position: number,
-        song: SongType,
+        song: ItemType,
     }[],
 }
 

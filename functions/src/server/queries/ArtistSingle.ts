@@ -1,6 +1,7 @@
 import {GraphQLNonNull, GraphQLString} from "graphql";
 import Artist from '../types/Artist';
 import {transformSnapshot} from "../utils/transform";
+import {QueryDocumentSnapshot} from "@google-cloud/firestore";
 
 export default {
     type: Artist,
@@ -11,7 +12,8 @@ export default {
         }
     },
     resolve (root, {id}, {database}) {
-        return database.doc(`/artists/${id}`).get().then(transformSnapshot);
+        return database.doc(`/artists/${id}`).get()
+            .then((snapshot: QueryDocumentSnapshot) => snapshot.exists ? transformSnapshot(snapshot) : null);
     }
 };
 

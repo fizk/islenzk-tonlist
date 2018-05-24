@@ -1,73 +1,31 @@
-import {GraphQLString, GraphQLNonNull, GraphQLInputObjectType, GraphQLInt, GraphQLID} from 'graphql';
-import Item from '../types/Item';
+import {GraphQLNonNull} from 'graphql';
+import Item, {ItemInput, ItemType} from '../types/Item';
+import {transformSnapshot} from "../utils/transform";
+import {DatabaseTypes as D} from "../../@types";
 
 export default {
     type: Item,
     args: {
-        collection: {
-            name: 'collection',
-            type: GraphQLID,
-        },
-        item: {
+        values: {
             name: 'item',
-            type: new GraphQLInputObjectType({
-                name: 'ItemInput',
-                fields: {
-                    name: {
-                        name: 'name',
-                        type: new GraphQLNonNull(GraphQLString)
-                    },
-                    description: {
-                        name: 'description',
-                        type: GraphQLString,
-                    },
-                    type: {
-                        name: 'type',
-                        type: new GraphQLNonNull(GraphQLString),
-                    },
-                    duration: {
-                        name: 'duration',
-                        type: GraphQLInt
-                    }
-                }
-            })
+            type: new GraphQLNonNull(ItemInput),
         },
+        type: {
+            type: new GraphQLNonNull(ItemType),
+        }
     },
-    resolve (root, {item, collection}, {database, search, }) {
-        return {}
-        // return database.insert({
-        //     name: Item.name,
-        //     description: Item.description,
-        //     duration: Item.duration || 0,
-        //     __contentType: `Item/${Item.type}`,
-        //     __ref: [],
-        //     __created: new Date(),
-        // }).then(result => {
-        //     if (!result.result.ok) throw new Error(result.result);
-        //
-        //     const {_id, ...rest, } = result.ops[0];
-        //
-        //     if (collection) {
-        //         database.update({_id: new ObjectID(collection)}, {
-        //             $push: {
-        //                 __ref: {
-        //                     _id: result.ops[0]._id,
-        //                     __contentType: `Item/${Item.type}`
-        //                 }
-        //             }
-        //         })
-        //     }
-        //
-        //     search.index({
-        //         index: 'application',
-        //         type: 'Item',
-        //         id: _id.toString(),
-        //         body: rest,
-        //     }).then(console.log)
-        //         .catch(console.error);
-        //
-        //     return result.ops[0];
-        //
-        // });
+    resolve (root, {values, type}, {database}) {
+        const data: D.Item = Object.assign({
+            __contentType: `item/${type}`,
+            __ref: [],
+            name: null,
+            description: null,
+            duration: 0,
+            genres: [],
+        }, values);
+
+        return database.collection('items').add(data)
+            .then(doc => doc.get())
+            .then(transformSnapshot);
     }
 };

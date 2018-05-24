@@ -4,13 +4,13 @@ export interface ImageType {
     base64: string,
 }
 
-export interface SongType {
+export interface ItemType {
     _id: string
     name: string
     description: string
     duration: number
     genres: GenreType[],
-    appearsOn: AlbumType[]
+    appearsOn: CollectionType[]
     hero: ImageType
     avatar: ImageType
 }
@@ -25,24 +25,6 @@ export interface PublicationType {
     date
     formats
     publishers: PublisherType[]
-}
-
-export interface AlbumType {
-    _id: string,
-    name: string,
-    aka: string[]
-    description: string
-    releaseDates: string,
-    contentType: ContentTypeType,
-    hero: ImageType
-    avatar: ImageType
-    genres: GenreType[],
-    artists: ArtistType[]
-    publications: PublicationType[]
-    songs: {
-        position: number
-        song: SongType
-    }[]
 }
 
 export interface PeriodType {
@@ -69,10 +51,10 @@ export interface ArtistPersonType {
     periods: PeriodType[],
     genres: GenreType[],
     contentType: ContentTypeType,
-    albums: AlbumType[],
-    compilations: AlbumType[],
-    eps: AlbumType[],
-    singles: AlbumType[],
+    albums: CollectionType[],
+    compilations: CollectionType[],
+    eps: CollectionType[],
+    singles: CollectionType[],
     association: {
         group: ArtistType,
         periods: PeriodType[],
@@ -89,10 +71,10 @@ export interface ArtistGroupType {
     periods: PeriodType[],
     genres: GenreType[],
     contentType: ContentTypeType,
-    albums: AlbumType[],
-    compilations: AlbumType[],
-    eps: AlbumType[],
-    singles: AlbumType[],
+    albums: CollectionType[],
+    compilations: CollectionType[],
+    eps: CollectionType[],
+    singles: CollectionType[],
     members: {
         artist: ArtistType,
         periods: PeriodType[],
@@ -107,12 +89,17 @@ export type ArtistType = ArtistGroupType & ArtistPersonType
 export interface CollectionType {
     _id: string,
     name: string,
-    aka: string[],
-    description: string,
+    aka: string[]
+    description: string
     releaseDates: string,
-    genres: GenreType[],
     contentType: ContentTypeType,
     hero: ImageType | null,
     avatar: ImageType | null,
+    genres: GenreType[],
     artists: ArtistType[]
+    publications: PublicationType[]
+    songs: {
+        position: number
+        song: ItemType
+    }[]
 }

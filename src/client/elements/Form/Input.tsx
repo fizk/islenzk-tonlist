@@ -1,5 +1,6 @@
 import * as React from 'react';
 import classVariations from '../../helpers/classVariations';
+import './_input.scss';
 
 type Props = {
     variations?: string[]
@@ -9,7 +10,7 @@ type Props = {
     required?: boolean
 }
 
-class Input extends React.Component<Props> {
+export default class Input extends React.Component<Props> {
 
     static defaultProps = {
         variations: [],

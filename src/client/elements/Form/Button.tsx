@@ -1,9 +1,16 @@
 import * as React from 'react';
 import classVariations from '../../helpers/classVariations';
+import {StatelessComponent} from "react";
+import './_button.scss';
 
-const Button = props => {
-    const {variations, ...rest} = props;
-    return (<button className={classVariations('button', variations)} {...rest}>{props.children}</button>);
+interface Props extends React.HTMLAttributes<HTMLButtonElement> {
+    variations?: string[]
+}
+
+const Button: StatelessComponent<Props> =  ({children, variations = [], ...rest}) => {
+
+    return (<button className={classVariations('button', variations)} {...rest}>{children}</button>);
 };
 
-export {Button};
+export default Button;
+export {Button}

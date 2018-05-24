@@ -3,7 +3,7 @@ import {
     GraphQLString,
     GraphQLList,
     GraphQLInputObjectType,
-    GraphQLUnionType
+    GraphQLUnionType, GraphQLEnumType
 } from "graphql";
 import {PeriodTypeInput} from './Period';
 import Group from "./Group";
@@ -15,7 +15,7 @@ export default new GraphQLUnionType({
     resolveType: data => data.__contentType === 'artist/person' ? Person : Group,
 });
 
-const ArtistInput = new GraphQLInputObjectType({
+export const ArtistInput = new GraphQLInputObjectType({
     name: 'ArtistInput',
     fields: {
         name: {
@@ -41,4 +41,10 @@ const ArtistInput = new GraphQLInputObjectType({
     },
 });
 
-export {ArtistInput};
+export const ArtistType = new GraphQLEnumType({
+    name: 'ArtistType',
+    values: {
+        person: {value: 'person'},
+        group: {value: 'group'},
+    }
+});

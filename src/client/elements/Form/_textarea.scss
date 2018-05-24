@@ -2,9 +2,11 @@
 
 
 .textarea {
-    border-style: none;
     outline: none;
     box-sizing: border-box;
+
+    //border-style: none;
+    border: 1px solid rgb(200, 200, 200);
 }
 
 .textarea::placeholder {

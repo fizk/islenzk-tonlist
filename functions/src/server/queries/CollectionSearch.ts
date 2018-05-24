@@ -1,6 +1,5 @@
 import {GraphQLString, GraphQLList, GraphQLInt, GraphQLNonNull} from "graphql";
-import Collection from '../types/Collection';
-import CollectionType from "../types/CollectionType";
+import Collection, {CollectionType} from '../types/Collection';
 
 export default {
     type: new GraphQLList(Collection),
@@ -19,29 +18,18 @@ export default {
         }
     },
     resolve (root, {term, type, limit = 10}, {database, search}) {
-        const condition = Object.assign({
-            should: [
-                {
-                    fuzzy: {
-                        "name.raw": {value: term, boost: 1}
-                    }
-                },{
-                    fuzzy: {
-                        "aka.raw": {value: term}
-                    }
-                }
-            ]
-        }, type ? {
-            must: [
-                {
-                    term: {
-                        __contentType: {
-                            value: `collection/${type}`
-                        }
-                    }
-                }
-            ]
-        } : {});
+        const condition = {must: []};
+
+        condition.must.push({
+            fuzzy: {'name.raw': {value: term}}
+        });
+
+        if (type) {
+            condition.must.push({
+                match: {'__contentType': `collection/${type}`}
+            });
+        }
+
         return search.search({
             index: 'it_collections',
             body: {

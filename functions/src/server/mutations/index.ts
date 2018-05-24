@@ -1,36 +1,28 @@
 
 import ArtistAdd from './ArtistAdd';
-import ArtistAddPeriod from './ArtistAddPeriod';
-import ArtistAddMember from './ArtistAddMember';
-import ArtistDisConnectArtist from './ArtistDisConnectArtist';
-import ArtistDisConnectCollection from './ArtistDisConnectCollection';
-import ArtistRemovePeriod from './ArtistRemovePeriod';
 import ArtistUpdate from './ArtistUpdate';
-import ArtistUpdatePeriod from './ArtistUpdatePeriod';
+import ArtistAddMember from './ArtistAddMember';
+import ArtistAddCollection from './ArtistAddCollection';
+import ArtistRemoveReference from './ArtistRemoveReference';
+
 import CollectionAdd from './CollectionAdd';
-import CollectionConnectItem from './CollectionConnectItem';
-import CollectionDisconnectItem from './CollectionDisconnectItem';
 import CollectionUpdate from './CollectionUpdate';
-import ImageSetAvatar from './ImageSetAvatar';
-import ImageSetHero from './ImageSetHero';
+import CollectionAddItem from './CollectionAddItem';
+import CollectionRemoveReference from './CollectionRemoveReference'
+
 import ItemAdd from './ItemAdd';
-import ItemConnectArtistForRole from './ItemConnectArtistForRole';
+import ItemUpdate from './ItemUpdate';
 
 export default {
     ArtistAdd,
-    ArtistAddPeriod,
     ArtistAddMember,
-    ArtistDisConnectArtist,
-    ArtistDisConnectCollection,
-    ArtistRemovePeriod,
+    ArtistAddCollection,
+    ArtistRemoveReference,
     ArtistUpdate,
-    ArtistUpdatePeriod,
     CollectionAdd,
-    CollectionConnectItem,
-    CollectionDisconnectItem,
+    CollectionAddItem,
+    CollectionRemoveReference,
     CollectionUpdate,
-    ImageSetAvatar,
-    ImageSetHero,
     ItemAdd,
-    ItemConnectArtistForRole
+    ItemUpdate,
 };

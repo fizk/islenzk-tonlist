@@ -2,8 +2,6 @@ import * as React from 'react';
 import {Link} from 'react-router-dom';
 // import {OptionsWithKeyBinding, OptionsItem} from '../../elements/Options';
 import {Grid, Column, Row} from '../../elements/Grid';
-import {Avatar} from '../../elements/Avatar';
-import {Poster} from '../../elements/Poster';
 import {SuggestItemAvatar, SuggestItem} from '../../elements/Suggest';
 import {SuggestCreateWithState} from '../../components/SuggestCreate';
 import {IT} from '../../elements/Icons';

@@ -28,6 +28,10 @@ export default {
                                 fuzzy: {
                                     "aka.raw": {value: term}
                                 }
+                            }, {
+                                fuzzy: {
+                                    "description.raw": {value: term}
+                                }
                             }
                         ]
                     }

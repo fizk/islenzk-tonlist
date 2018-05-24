@@ -1,95 +1,134 @@
 import * as React from 'react';
-// import {OptionsWithKeyBinding, OptionsItem} from '../../elements/Options';
-import {Avatar} from '../../elements/Avatar';
-import {Button} from '../../elements/Form';
-
+import AutoCompleteArtist from '../../elements/AutoComplete/AutoCompleteArtist';
+import AutoCompleteCreateArtist from "../../elements/AutoComplete/AutoCompleteCreateArtist";
+import AutoComplete from "../../elements/AutoComplete/AutoComplete";
+import gql from "graphql-tag";
+import  * as debounce from 'throttle-debounce/debounce';
+import ApolloClient from "apollo-client/ApolloClient";
+import {FetchResult} from "apollo-link";
+import {ApolloQueryResult} from "apollo-client";
+import './_index.scss';
 
 type Props = {
-    onCreate: (value: string) => void,
-    onSelect: (item: string) => void,
-    doSearch?: (term: string, type: string, section: string) => void,
-    section?: string,
-    isSearching?: boolean,
-    type: string,
-    results?: {
-        avatar: {
-            url: string,
-            base64: string,
-    },
-    releaseDate?: string,
-    name?: string,
-    _id?: string,
-    }[]
+    type?: string
+    onSelect: (item: any) => void
 }
 
 type State = {
-    value: string
+    items: any[]
+    term: string
+    isSearching: boolean
+    isCreate: boolean
 }
 
-class ArtistSearch extends React.Component<Props, State> {
-
+export default class ArtistSearch extends React.Component<Props, State, {client: ApolloClient<any>}> {
     static defaultProps = {
-        onCreate: () => {},
-        onSelect: () => {},
-        doSearch: () => {},
-        results: [],
-        section: 'default',
-        isSearching: false,
         type: 'person',
+        onSelect: (item: any) => {}
     };
 
-    constructor(props) {
-        super(props);
+    static contextTypes = {
+        client: () => {},
+    };
 
-        this.handleSearchChange = this.handleSearchChange.bind(this);
-        this.handleSearchSelect = this.handleSearchSelect.bind(this);
-        this.handleOnCreate = this.handleOnCreate.bind(this);
+    state = {
+        items: [],
+        term: undefined,
+        isSearching: false,
+        isCreate: false,
+    };
 
-        this.state = {
-            value: '',
-        };
+    constructor(props, context) {
+        super(props, context);
+
+        this.handleSearch = debounce(1000, this.handleSearch.bind(this));
+        this.handleCreateArtist = this.handleCreateArtist.bind(this)
     }
 
-    handleSearchChange(term) {
-        this.props.doSearch(term, this.props.type, this.props.section);
-        this.setState({value: term});
+    handleSearch(term)  {
+        if (term.length === 0) {
+            return;
+        }
+
+        this.setState({isSearching: true, term: term});
+        this.context.client.query({
+            query: artistSearchQuery,
+            variables: {term: term, type: this.props.type}
+        }).then((result: ApolloQueryResult<any>) => {
+            this.setState({
+                items: result.data.ArtistSearch,
+                isSearching: false,
+                isCreate: result.data.ArtistSearch.length === 0 && term.length > 5
+            });
+        });
+    };
+
+    handleCreateArtist() {
+        this.handleOnClear();
+        this.context.client.mutate({
+            mutation: artistCreateQuery,
+            variables: {type: this.props.type, values: {name: this.state.term}}
+        }).then((result: FetchResult) => {
+            this.props.onSelect(result.data.ArtistAdd)
+        });
     }
 
-    handleSearchSelect(item) {
-        this.props.onSelect(item);
-    }
-
-    handleOnCreate() {
-        this.props.onCreate(this.state.value);
-    }
+    handleOnClear = () => {
+        this.setState({
+            items: [],
+            term: undefined,
+            isSearching: false,
+            isCreate: false,
+        })
+    };
 
     render() {
         return (
-            <div style={{display: 'flex', }}>
-                {/*<OptionsWithKeyBinding*/}
-                    {/*elastic={true}*/}
-                    {/*isSearching={this.props.isSearching}*/}
-                    {/*onChange={this.handleSearchChange}*/}
-                    {/*onSelect={this.handleSearchSelect}>*/}
-                    {/*{this.props.results.map(item => (*/}
-                        {/*<OptionsItem key={item._id} value={item}>*/}
-                            {/*<div style={{display: 'flex'}}>*/}
-                                {/*<div>*/}
-                                    {/*{item.name}*/}
-                                    {/*{item.releaseDate}*/}
-                                {/*</div>*/}
-                                {/*<div>*/}
-                                    {/*<Avatar base64={item.avatar ? item.avatar.base64 : undefined}*/}
-                                        {/*src={item.avatar ? item.avatar.url : undefined}/>*/}
-                                {/*</div>*/}
-                            {/*</div>*/}
-                        {/*</OptionsItem>*/}
-                    {/*))}*/}
-                {/*</OptionsWithKeyBinding>*/}
-                <Button variations={['primary']} onClick={this.handleOnCreate}>create!</Button>
-            </div>
+            <AutoComplete loading={this.state.isSearching} onType={this.handleSearch} onSelect={this.props.onSelect} onClear={this.handleOnClear}>
+                {this.state.items.map(item => (
+                    <AutoCompleteArtist key={item._id} value={item} />
+                ))}
+                {this.state.isCreate && (
+                    <AutoCompleteCreateArtist onCreate={this.handleCreateArtist} />
+                )}
+            </AutoComplete>
         );
     }
 }
 
-export {ArtistSearch, ArtistSearch as ArtistSearchWithState};
+export const artistSearchQuery = gql`
+    query search_artist ($term: String! $type: ArtistType) {
+        ArtistSearch (term: $term type: $type) {
+            __typename
+            ... on Group {
+                _id
+                name
+                avatar {base64 url}
+                contentType {attribute subtype type }
+                periods {from to}
+            }
+            ... on Person {
+                _id
+                name
+                avatar {base64 url}
+                contentType {attribute subtype type }
+                periods {from to}
+            }
+        }
+    }
+`;
+
+export const artistCreateQuery = gql`
+    mutation create_artist ($values: ArtistInput!, $type: ArtistType!) {
+        ArtistAdd (type: $type, values: $values ) {
+            ... on Group {
+                _id
+                contentType {attribute subtype type }
+            }
+            ... on Person {
+                _id
+                contentType {attribute subtype type }
+            }
+        }
+    }
+`;

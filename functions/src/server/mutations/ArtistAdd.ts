@@ -1,5 +1,7 @@
-import {GraphQLNonNull, GraphQLEnumType} from 'graphql';
-import Artist, {ArtistInput} from '../types/Artist'
+import {GraphQLNonNull} from 'graphql';
+import Artist, {ArtistInput, ArtistType} from '../types/Artist'
+import {transformSnapshot} from "../utils/transform";
+import {DatabaseTypes as D} from "../../@types";
 
 export default {
     type: Artist,
@@ -9,35 +11,23 @@ export default {
         },
         type: {
             name: 'type',
-            type: new GraphQLEnumType({
-                name: 'ArtistType',
-                values: {
-                    person: {value: 'person'},
-                    group: {value: 'group'},
-                }
-            })
+            type: new GraphQLNonNull(ArtistType)
         },
     },
     resolve (root, {values, type}, {database,}) {
-
-        const data = Object.assign({
+        const data: D.Artist = Object.assign({
             __contentType: `artist/${type}`,
             __ref: [],
             aka: [],
             description: null,
             genres: [],
             periods: [],
-            from: new Date(),
-            to: new Date(),
+            from: null,
+            to: null,
         }, values);
 
         return database.collection('artists').add(data)
             .then(doc => doc.get())
-            .then(snapshot => {
-                return {
-                    _id: snapshot.id,
-                    ...snapshot.data()
-                }
-            });
+            .then(transformSnapshot);
     }
 };

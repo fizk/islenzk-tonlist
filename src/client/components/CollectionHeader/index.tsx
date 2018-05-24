@@ -1,11 +1,11 @@
 import * as React from 'react';
-import {Hero} from '../../elements/Hero';
-import {Poster} from '../../elements/Poster';
-import {AlbumType} from "../../../../@types";
+import Hero from '../../elements/Hero';
+import Poster from '../../elements/Poster';
+import {CollectionType} from "../../../../@types";
 import './_index.scss';
 
 type Props = {
-    collection: AlbumType,
+    collection: CollectionType,
 }
 
 export default class CollectionHeader extends React.Component<Props> {
@@ -32,21 +32,12 @@ export default class CollectionHeader extends React.Component<Props> {
         return (
             <div className="collection-header">
                 <div className="collection-header__hero">
-                    <Hero
-                        width="100%"
-                        height="40vh"
-                        src={this.props.collection.hero && this.props.collection.hero.url}
-                        base64={this.props.collection.hero && this.props.collection.hero.base64} />
+                    <Hero src={this.props.collection.hero === null ? undefined : this.props.collection.hero} />
                 </div>
                 <div className="collection-header__headline">
                     <div>
                         <div className="collection-header__avatar-container">
-                            <Poster className="collection-header__avatar"
-                                src={this.props.collection.avatar && this.props.collection.avatar.url}
-                                base64={this.props.collection.avatar && this.props.collection.avatar.base64}
-                                width={120}
-                                height={120}
-                            />
+                            <Poster variations={['lg']} src={this.props.collection.avatar === null ? undefined : this.props.collection.avatar}/>
                         </div>
                     </div>
                     <div>

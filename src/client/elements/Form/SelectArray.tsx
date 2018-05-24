@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button} from '../../elements/Form';
+import {Button} from './Button';
 
 type Props = {
     onAdd: () => void,
