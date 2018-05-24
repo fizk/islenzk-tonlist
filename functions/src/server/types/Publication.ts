@@ -2,7 +2,7 @@ import {GraphQLObjectType, GraphQLString, GraphQLInputObjectType, GraphQLList} f
 import GraphQLDate from './GraphQLDate';
 import Publisher from './Publisher';
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
-import {Reference, ReferenceUnit} from "../../@types";
+import {DatabaseTypes as D} from "../../@types";
 import {transformSnapshot} from "../utils/transform";
 
 export default new GraphQLObjectType({
@@ -23,9 +23,9 @@ export default new GraphQLObjectType({
         publishers: {
             name: 'publishers',
             type: new GraphQLList(Publisher),
-            resolve(root: Reference) {
+            resolve(root: D.Unit) {
                 const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item:ReferenceUnit) => item.__contentType === 'publisher/publication')
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'publisher/publication')
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => {

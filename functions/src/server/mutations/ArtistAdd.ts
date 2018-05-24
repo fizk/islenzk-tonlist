@@ -1,6 +1,7 @@
 import {GraphQLNonNull} from 'graphql';
 import Artist, {ArtistInput, ArtistType} from '../types/Artist'
 import {transformSnapshot} from "../utils/transform";
+import {DatabaseTypes as D} from "../../@types";
 
 export default {
     type: Artist,
@@ -14,7 +15,7 @@ export default {
         },
     },
     resolve (root, {values, type}, {database,}) {
-        const data = Object.assign({
+        const data: D.Artist = Object.assign({
             __contentType: `artist/${type}`,
             __ref: [],
             aka: [],

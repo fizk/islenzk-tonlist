@@ -1,14 +1,24 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
 import {Database} from '../../utils/database'
+import {GraphQLTypes} from "../../../@types";
 
 describe('ItemAdd', () => {
-    test('one', async () => {
+    let database = undefined;
 
-        const database = new Database({});
+    beforeEach(() => {
+        database = new Database({});
+    });
+
+    afterEach(() => {
+        database = undefined;
+    });
+
+    test('create new song', async () => {
         const query = `
             mutation create_item  {
-              ItemAdd (type: song, values: {name: "item name"}) {
+              ItemAdd (type: song, values: {name: "Item Name"}) {
+                _id
                 name
               }
             }
@@ -18,15 +28,16 @@ describe('ItemAdd', () => {
         expect(0).toEqual(database.tableSize);
 
         //
-        const expected = {
+        const expected: {data: {ItemAdd: GraphQLTypes.ItemType}} = {
             data: {
                 ItemAdd: {
-                    name: 'item name',
+                    _id: 'new id',
+                    name: 'Item Name',
                 }
             }
         };
         const actual = await graphql(schema, query, {}, {database});
-        expect(actual).toEqual(expected);
+        expect(actual).toMatchShapeOf(expected);
 
         //Database size after insert
         expect(1).toEqual(database.tableSize);

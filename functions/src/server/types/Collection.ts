@@ -9,7 +9,7 @@ import Image from './Image';
 import Publication from './Publication';
 import Content from './Content'
 import Artist from './Artist';
-import {Reference, ReferenceUnit} from "../../@types";
+import {DatabaseTypes as D} from "../../@types";
 import Genre, {GenreInput} from "./Genre";
 import {splitContentType, splitGenre} from '../utils/split'
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
@@ -37,7 +37,7 @@ export default new GraphQLObjectType({
         genres: {
             name: 'genres',
             type: new GraphQLList(Genre),
-            resolve(root) {
+            resolve(root: D.Collection) {
                 return root.genres.map(splitGenre)
             }
         },
@@ -53,25 +53,25 @@ export default new GraphQLObjectType({
         contentType: {
             name: 'contentType',
             type: Content,
-            resolve: (root) => splitContentType(root.__contentType)
+            resolve: (root: D.Unit) => splitContentType(root.__contentType)
         },
         artists: {
             name: 'artists',
             type: new GraphQLList(Artist),
-            resolve(root, params, {database}) {
+            resolve(root: D.Unit, params, {database}) {
                 return database.doc(`/reference/${root._id}`).get()
                     .then(doc => doc.data())
-                    .then((data: Reference) => (data ? (data.__ref || []).filter(item => item.__contentType === 'collection/album') : []))
-                    .then((items: ReferenceUnit[]) => Promise.all(items.map(item => item._id.get())))
+                    .then((data: D.Unit) => (data ? (data.__ref || []).filter(item => item.__contentType === 'collection/album') : []))
+                    .then((items: D.ReferenceUnit[]) => Promise.all(items.map(item => item._id.get())))
                     .then(items => items.map(transformSnapshot));
             }
         },
         avatar: {
             name: 'avatar',
             type: Image,
-            resolve (root: ReferenceUnit) {
-                const imagesReference: ReferenceUnit = root.__ref
-                    .filter((item: ReferenceUnit) => item.__contentType === 'image/avatar')
+            resolve (root: D.Unit) {
+                const imagesReference: D.ReferenceUnit = root.__ref
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'image/avatar')
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
@@ -82,9 +82,9 @@ export default new GraphQLObjectType({
         hero: {
             name: 'hero',
             type: Image,
-            resolve (root: ReferenceUnit) {
-                const imagesReference: ReferenceUnit = root.__ref
-                    .filter((item: ReferenceUnit) => item.__contentType === 'image/hero')
+            resolve (root: D.Unit) {
+                const imagesReference: D.ReferenceUnit = root.__ref
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'image/hero')
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
@@ -104,20 +104,20 @@ export default new GraphQLObjectType({
                     song: {
                         name: 'song',
                         type: Item,
-                        resolve: (root) => root._id.get().then(transformSnapshot)
+                        resolve: (root: D.ReferenceUnit) => root._id.get().then(transformSnapshot)
                     }
                 }
             })),
-            resolve (root: Reference) {
+            resolve (root: D.Unit) {
                 return root.__ref.filter(item => item.__contentType === 'item/song');
             }
         },
         publications: {
             name: 'publication',
             type: new GraphQLList(Publication),
-            resolve(root: Reference) {
+            resolve(root: D.Unit) {
                 const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item:ReferenceUnit) => item.__contentType === 'publisher/publication')
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'publisher/publication')
                     .map(item => item._id.get());
 
                 return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => items.map(transformSnapshot));

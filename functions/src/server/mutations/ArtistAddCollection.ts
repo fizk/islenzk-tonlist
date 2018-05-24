@@ -1,7 +1,7 @@
 import {GraphQLID, GraphQLNonNull} from 'graphql';
 import {CollectionType} from '../types/Collection'
 import {QueryDocumentSnapshot} from "@google-cloud/firestore";
-import {ReferenceUnit} from "../../@types";
+import {DatabaseTypes as D} from "../../@types";
 import uuid from 'uuid/v4';
 import {transformSnapshot} from "../utils/transform";
 import Artist from "../types/Artist";
@@ -27,7 +27,7 @@ export default {
         return artistReference.get()
             .then((snapshot: QueryDocumentSnapshot) => {
                 const data = snapshot.data();
-                const reference: ReferenceUnit = {
+                const reference: D.ReferenceUnit = {
                     __contentType: `collection/${collectionType}`,
                     _id: database.doc(`collections/${collection}`),
                     __created: new Date(),

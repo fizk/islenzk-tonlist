@@ -1,21 +1,23 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
 import {Snapshot, Database} from '../../utils/database';
+import {DatabaseTypes, GraphQLTypes} from "../../../@types";
 
 describe('ArtistAddCollection', () => {
-
     let database = undefined;
 
     beforeEach(() => {
         database = new Database({
-            '/artists/1': new Snapshot('1', {
+            '/artists/1': new Snapshot<DatabaseTypes.Artist>({
+                _id: '1',
                 __contentType: 'artist/person',
-                name: 'hundur',
-                __ref: []
+                name: 'Artist Name',
+                __ref: [],
             }),
-            'collections/2': new Snapshot('2', {
+            'collections/2': new Snapshot<DatabaseTypes.Collection>({
+                _id: '2',
                 __contentType: 'collection/album',
-                name: 'some name',
+                name: 'Collection Name',
                 __ref: []
             }),
         });
@@ -34,6 +36,7 @@ describe('ArtistAddCollection', () => {
                   _id
                   name
                   albums {
+                    __typename
                     _id
                     name
                   }
@@ -42,21 +45,21 @@ describe('ArtistAddCollection', () => {
             }
         `;
 
-        const expected = {
+        const expected: {data: {ArtistAddCollection: GraphQLTypes.Artist}} = {
             data: {
                 ArtistAddCollection: {
                     __typename: 'Person',
                     _id: '1',
-                    name: 'hundur',
+                    name: 'Artist Name',
                     albums: [{
+                        __typename: 'Collection',
                         _id: '2',
-                        name: 'some name',
+                        name: 'Collection Name',
                     }]
                 }
             }
         };
         const actual = await graphql(schema, query, {}, {database});
-
         expect(actual).toEqual(expected);
         expect(actual.errors).toBeUndefined();
     });
@@ -106,12 +109,12 @@ describe('ArtistAddCollection', () => {
             }
         `;
 
-        const expected = {
+        const expected: {data: {ArtistAddCollection: GraphQLTypes.Artist}} = {
             data: {
                 ArtistAddCollection: {
                     __typename: 'Person',
                     _id: '1',
-                    name: 'hundur',
+                    name: 'Artist Name',
                     albums: []
                 }
             }

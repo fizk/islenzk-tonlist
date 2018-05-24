@@ -1,11 +1,21 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
 import {Database} from '../../utils/database'
+import {GraphQLTypes} from "../../../@types";
 
 describe('CollectionAdd', () => {
-    test('one', async () => {
+    let database = undefined;
 
-        const database = new Database({});
+    beforeEach(() => {
+        database = new Database({});
+    });
+
+    afterEach(() => {
+        database = undefined;
+    });
+
+    test('add new album', async () => {
+
         const query = `
             mutation create_collection {
               CollectionAdd(type: album, values: {name:"new album" }) {
@@ -24,7 +34,7 @@ describe('CollectionAdd', () => {
         expect(0).toEqual(database.tableSize);
 
         //
-        const expected = {
+        const expected: {data: {CollectionAdd: GraphQLTypes.Collection}} = {
             data: {
                 CollectionAdd: {
                     __typename: 'Collection',

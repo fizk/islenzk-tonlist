@@ -3,7 +3,7 @@ import {GroupMember} from '../types/Group';
 import uuid from 'uuid/v4';
 import {QueryDocumentSnapshot} from "@google-cloud/firestore";
 import {PeriodTypeInput} from "../types/Period";
-import {ReferenceUnit} from "../../@types";
+import {DatabaseTypes as D} from "../../@types";
 
 export default {
     type: GroupMember,
@@ -25,7 +25,7 @@ export default {
         return database.doc(`/artists/${artist}`).get()
             .then((snapshot: QueryDocumentSnapshot) => {
                 const data = snapshot.data();
-                const reference: ReferenceUnit = {
+                const reference: D.ReferenceUnit = {
                     __contentType: 'artist/person+member',
                     _id: database.doc(`artists/${member}`),
                     __created: new Date(),

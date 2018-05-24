@@ -1,19 +1,22 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
 import {Database, Snapshot} from '../../utils/database'
+import {DatabaseTypes, GraphQLTypes} from "../../../@types";
 
 describe('ArtistUpdate', () => {
     let database = undefined;
 
     beforeEach(() => {
         database = new Database({
-            'artists/1': new Snapshot('1', {
+            'artists/1': new Snapshot<DatabaseTypes.Artist>({
+                _id: '1',
                 __contentType: 'artist/person',
                 name: 'hundur',
                 __ref: []
             }),
-            'artists/2': new Snapshot('2', {
-                __contentType: 'collection/album',
+            'artists/2': new Snapshot<DatabaseTypes.Artist>({
+                _id: '2',
+                __contentType: 'artist/person',
                 name: 'some name',
                 __ref: []
             }),
@@ -24,7 +27,7 @@ describe('ArtistUpdate', () => {
         database = undefined;
     });
 
-    test('one', async () => {
+    test('update name', async () => {
 
         const query = `
             mutation artist_update {
@@ -37,7 +40,7 @@ describe('ArtistUpdate', () => {
             }
         `;
 
-        const expected = {
+        const expected: {data: {ArtistUpdate: GraphQLTypes.Artist}} = {
             data: {
                 ArtistUpdate: {
                     __typename: 'Person',

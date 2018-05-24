@@ -1,25 +1,27 @@
-export class Snapshot {
+import {DatabaseTypes} from '../../@types'
+
+export class Snapshot<T extends DatabaseTypes.Unit> {
     __data = undefined;
-    id = undefined;
+    id: undefined | string;
     exists = undefined;
     updateTime = new Date();
     createTime = new Date();
 
-    constructor(id, data, exists = true) {
-        this.id = id;
+    constructor(data: T, exists: boolean = true) {
         this.__data = data;
+        this.id = data._id;
         this.exists = exists;
     }
 
-    get ref() {
+    get ref(): Snapshot<T> {
         return this;
     }
 
-    get() {
+    get(): Promise<Snapshot<T>> {
         return Promise.resolve(this);
     }
 
-    data() {
+    data(): T {
         return this.__data
     }
 
@@ -54,7 +56,7 @@ export class Database {
             },
             add: (data) => {
                 const key = Math.random();
-                const snapshot = new Snapshot(key, data);
+                const snapshot = new Snapshot({_id: key, ...data});
                 this.table[`${collection}/${key}`] = snapshot;
                 return Promise.resolve(snapshot);
             }
@@ -62,7 +64,7 @@ export class Database {
     }
 
     doc(id) {
-        return this.table[id] || new Snapshot(0, {}, false)
+        return this.table[id] || new Snapshot<any>({}, false)
     }
 
     get tableSize() {

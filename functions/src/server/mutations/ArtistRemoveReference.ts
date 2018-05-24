@@ -3,7 +3,7 @@ import {QueryDocumentSnapshot} from "@google-cloud/firestore";
 import {transformSnapshot} from "../utils/transform";
 import Artist from "../types/Artist";
 import GraphQLUUID from 'graphql-tools-type-uuid';
-import {ReferenceUnit} from "../../@types";
+import {DatabaseTypes as D} from "../../@types";
 
 export default {
     type: Artist,
@@ -20,7 +20,7 @@ export default {
     resolve (root, {artist, reference}, {database}) {
         return database.doc(`/artists/${artist}`).get()
             .then((snapshot: QueryDocumentSnapshot) => {
-                const refArray: ReferenceUnit[] = snapshot.data().__ref.filter((item: ReferenceUnit) =>  item.__uuid !== reference);
+                const refArray: D.ReferenceUnit[] = snapshot.data().__ref.filter((item: D.ReferenceUnit) =>  item.__uuid !== reference);
                 return snapshot.ref.update({__ref: refArray}).then(() => snapshot.ref.get());
             })
             .then((snapshot: QueryDocumentSnapshot) => snapshot.exists ? transformSnapshot(snapshot) : null);

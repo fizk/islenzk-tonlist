@@ -4,7 +4,7 @@ import {
 } from "graphql";
 import Collection from './Collection';
 import ArtistRole from './ArtistRole';
-import {Reference, ReferenceUnit} from "../../@types";
+import {DatabaseTypes as D} from "../../@types";
 import Genre, {GenreInput} from "./Genre";
 import {splitContentType} from "../utils/split";
 import UnitInterface from "./Unit";
@@ -71,8 +71,8 @@ export default new GraphQLObjectType({
             resolve(root, params, {database}) {
                 return database.doc(`/reference/${root._id}`).get()
                     .then(doc => doc.data())
-                    .then((data: Reference) => data.__ref.filter(item => item.__contentType === 'item/song'))
-                    .then((items: ReferenceUnit[]) => Promise.all(items.map(item => item._id.get())))
+                    .then((data: D.Unit) => data.__ref.filter(item => item.__contentType === 'item/song'))
+                    .then((items: D.ReferenceUnit[]) => Promise.all(items.map(item => item._id.get())))
                     .then(items => items.map(transformSnapshot));
             }
         }

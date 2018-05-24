@@ -1,21 +1,23 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
 import {Snapshot, Database} from '../../utils/database';
+import {DatabaseTypes, GraphQLTypes} from "../../../@types";
 
 describe('ArtistAddMember', () => {
-
     let database = undefined;
 
     beforeEach(() => {
         database = new Database({
-            '/artists/1': new Snapshot('1', {
+            '/artists/1': new Snapshot<DatabaseTypes.Artist>({
+                _id: '1',
                 __contentType: 'artist/group',
-                name: 'hundur',
+                name: 'Artist Name',
                 __ref: []
             }),
-            'artists/2': new Snapshot('2', {
+            'artists/2': new Snapshot<DatabaseTypes.Artist>({
+                _id: '2',
                 __contentType: 'artist/person',
-                name: 'some name',
+                name: 'Collection Name',
                 __ref: []
             }),
         });
@@ -31,6 +33,7 @@ describe('ArtistAddMember', () => {
               ArtistAddMember(artist: "1", member: "2") {
                 periods {from to}
                 artist {
+                  __typename
                   _id 
                   name
                   avatar {base64 url}
@@ -40,13 +43,14 @@ describe('ArtistAddMember', () => {
             }
         `;
 
-        const expected = {
+        const expected: {data: {ArtistAddMember: GraphQLTypes.GroupMember}} = {
             data: {
                 ArtistAddMember: {
                     periods: [{from: null, to: null}],
                     artist: {
+                        __typename: 'Person',
                         _id: 'id',
-                        name: 'name',
+                        name: 'Artist Name',
                         avatar: null
                     },
                     uuid: 'string'

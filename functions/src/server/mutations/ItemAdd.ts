@@ -1,6 +1,7 @@
 import {GraphQLNonNull} from 'graphql';
 import Item, {ItemInput, ItemType} from '../types/Item';
 import {transformSnapshot} from "../utils/transform";
+import {DatabaseTypes as D} from "../../@types";
 
 export default {
     type: Item,
@@ -14,7 +15,7 @@ export default {
         }
     },
     resolve (root, {values, type}, {database}) {
-        const data = Object.assign({
+        const data: D.Item = Object.assign({
             __contentType: `item/${type}`,
             __ref: [],
             name: null,

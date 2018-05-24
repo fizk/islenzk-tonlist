@@ -1,6 +1,7 @@
 import {GraphQLNonNull} from 'graphql';
 import Collection, {CollectionInput, CollectionType} from '../types/Collection';
 import {transformSnapshot} from "../utils/transform";
+import {DatabaseTypes as D} from "../../@types";
 
 export default {
     type: Collection,
@@ -15,7 +16,7 @@ export default {
     },
     resolve (root, {values, type}, {database,}) {
 
-        const data = Object.assign({
+        const data: D.Collection = Object.assign({
             __contentType: `collection/${type}`,
             __ref: [],
             aka: [],

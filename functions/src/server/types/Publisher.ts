@@ -1,6 +1,6 @@
 import {GraphQLObjectType, GraphQLString, GraphQLID, GraphQLNonNull} from "graphql";
 import Image from './Image';
-import {ReferenceUnit} from "../../@types";
+import {DatabaseTypes as D} from "../../@types";
 import UnitInterface from "./Unit";
 import Content from "./Content";
 import {splitContentType} from "../utils/split";
@@ -37,9 +37,9 @@ export default new GraphQLObjectType({
         avatar: {
             name: 'avatar',
             type: Image,
-            resolve (root: ReferenceUnit) {
-                const imagesReference: ReferenceUnit = root.__ref
-                    .filter((item: ReferenceUnit) => item.__contentType === 'image/avatar')
+            resolve (root: D.Unit) {
+                const imagesReference: D.ReferenceUnit = root.__ref
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'image/avatar')
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
@@ -50,9 +50,9 @@ export default new GraphQLObjectType({
         hero: {
             name: 'hero',
             type: Image,
-            resolve (root: ReferenceUnit) {
-                const imagesReference: ReferenceUnit = root.__ref
-                    .filter((item: ReferenceUnit) => item.__contentType === 'image/hero')
+            resolve (root: D.Unit) {
+                const imagesReference: D.ReferenceUnit = root.__ref
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'image/hero')
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference

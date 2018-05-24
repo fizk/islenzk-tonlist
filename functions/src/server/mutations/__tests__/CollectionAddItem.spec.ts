@@ -1,21 +1,23 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
 import {Snapshot, Database} from '../../utils/database';
+import {DatabaseTypes, GraphQLTypes} from "../../../@types";
 
 describe('CollectionAddItem', () => {
-
     let database = undefined;
 
     beforeEach(() => {
         database = new Database({
-            'items/2': new Snapshot('1', {
-                __contentType: 'artist/person',
-                name: 'hundur',
+            'items/2': new Snapshot<DatabaseTypes.Item>({
+                _id: '2',
+                __contentType: 'item/song',
+                name: 'Item Name',
                 __ref: []
             }),
-            'collections/2': new Snapshot('2', {
+            'collections/2': new Snapshot<DatabaseTypes.Collection>({
+                _id: '2',
                 __contentType: 'collection/album',
-                name: 'some name',
+                name: 'Collection Name',
                 __ref: []
             }),
         });
@@ -31,20 +33,21 @@ describe('CollectionAddItem', () => {
               CollectionAddItem(collection: "2", item: "2", type: song, position: 1, orderLabel: "some") {
                 __typename
                 name
-                songs {position song{name}}
+                songs {position song{name _id}}
               }
             }
         `;
 
-        const expected = {
+        const expected: {data: {CollectionAddItem: GraphQLTypes.Collection}} = {
             data: {
                 CollectionAddItem: {
                     __typename: 'Collection',
-                    name: 'some name',
+                    name: 'Collection Name',
                     songs: [{
                         position: 1,
                         song: {
-                            name: 'hundur',
+                            _id: '2',
+                            name: 'Item Name',
                         },
                     }]
                 }
@@ -77,31 +80,6 @@ describe('CollectionAddItem', () => {
         expect(actual.data).toEqual(expected.data);
         expect(actual.errors).toBeInstanceOf(Array)
     });
-
-    // test('item not found', async () => {
-    //     const query = `
-    //         mutation collection_add_item {
-    //           CollectionAddItem(collection: "2", item: "invalid-id", type: song, position: 1, orderLabel: "some") {
-    //             __typename
-    //             name
-    //             songs {position song{name}}
-    //           }
-    //         }
-    //     `;
-    //
-    //     const expected = {
-    //         data: {
-    //             CollectionAddItem: {
-    //                 __typename: 'Collection',
-    //                 name: 'some name',
-    //                 songs: []
-    //             }
-    //         }
-    //     };
-    //     const actual = await graphql(schema, query, {}, {database});
-    //     expect(actual.data).toEqual(expected.data);
-    //     expect(actual.errors).toBeUndefined();
-    // });
 });
 
 

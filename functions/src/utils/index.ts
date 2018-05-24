@@ -4,7 +4,7 @@ import DocumentReference = admin.firestore.DocumentReference;
 import {Change, EventContext} from "firebase-functions/lib/cloud-functions";
 import {CollectionReference, WriteResult} from "@google-cloud/firestore";
 import {refDifference} from './reference';
-import {ReferenceUnit} from "../@types";
+import {DatabaseTypes} from "../@types";
 
 /**
  * Takes a DocumentSnapshot. It will then, for each item in the __ref array, substitutes the _id value with a reference to this snapshot.
@@ -19,7 +19,7 @@ import {ReferenceUnit} from "../@types";
  * @param {FirebaseFirestore.CollectionReference} collection
  * @return {(referenceItem: Reference) => Promise<WriteResult>}
  */
-export const copyReferences = (snapshot: DocumentSnapshot, collection: CollectionReference): (referenceItem: ReferenceUnit) => Promise<WriteResult> => (referenceItem: ReferenceUnit):  Promise<WriteResult> => {
+export const copyReferences = (snapshot: DocumentSnapshot, collection: CollectionReference): (referenceItem: DatabaseTypes.ReferenceUnit) => Promise<WriteResult> => (referenceItem: DatabaseTypes.ReferenceUnit):  Promise<WriteResult> => {
     const collectionDocument: DocumentReference = collection.doc(referenceItem._id.id);
 
     return collectionDocument.get().then((doc: DocumentSnapshot) => {
@@ -43,7 +43,7 @@ export const copyReferences = (snapshot: DocumentSnapshot, collection: Collectio
  * @return {(referenceItem: Reference) => Promise<WriteResult>}
  * @see copyReferences for more details
  */
-export const updateReference = (collection: CollectionReference): (referenceItem: ReferenceUnit) => Promise<WriteResult> => (referenceItem: ReferenceUnit):  Promise<WriteResult> => {
+export const updateReference = (collection: CollectionReference): (referenceItem: DatabaseTypes.ReferenceUnit) => Promise<WriteResult> => (referenceItem: DatabaseTypes.ReferenceUnit):  Promise<WriteResult> => {
     const collectionDocument: DocumentReference = collection.doc(referenceItem._id.id);
 
     return collectionDocument.get().then((doc: DocumentSnapshot) => {
@@ -70,7 +70,7 @@ export const updateReference = (collection: CollectionReference): (referenceItem
  * @return {(referenceItem: Reference) => Promise<WriteResult>}
  * @see copyReferences for more details
  */
-export const deleteReferences = (collection: CollectionReference): (referenceItem: ReferenceUnit) => Promise<WriteResult> => (referenceItem: ReferenceUnit):  Promise<WriteResult> => {
+export const deleteReferences = (collection: CollectionReference): (referenceItem: DatabaseTypes.ReferenceUnit) => Promise<WriteResult> => (referenceItem: DatabaseTypes.ReferenceUnit):  Promise<WriteResult> => {
     const collectionDocument: DocumentReference = collection.doc(referenceItem._id.id);
 
     return collectionDocument.get().then(doc => {
@@ -174,7 +174,7 @@ export const createReferenceRecord = (collectionReference: CollectionReference) 
     const data = snapshot.data();
     const copyFunction = copyReferences(snapshot, collectionReference);
 
-    return data.__ref.reduce((promise: Promise<WriteResult>, item: ReferenceUnit) => (
+    return data.__ref.reduce((promise: Promise<WriteResult>, item: DatabaseTypes.ReferenceUnit) => (
         promise.then(() => copyFunction(item))
     ), Promise.resolve({writeTime: new Date().toISOString()}));
 };
@@ -198,7 +198,7 @@ export const updateReferenceRecord = (collectionReference: CollectionReference) 
     const deleteFunction = deleteReferences(collectionReference);
     const deleteTask = diffObject.deleted.map(updated => ({data: updated, fn: deleteFunction}));
 
-    return [...addTasks, ...updateTask, ...deleteTask].reduce((promise: Promise<WriteResult>, item: {fn: (item: ReferenceUnit) => Promise<WriteResult>, data: ReferenceUnit}) => (
+    return [...addTasks, ...updateTask, ...deleteTask].reduce((promise: Promise<WriteResult>, item: {fn: (item: DatabaseTypes.ReferenceUnit) => Promise<WriteResult>, data: DatabaseTypes.ReferenceUnit}) => (
         promise.then(() => item.fn(item.data))
     ), Promise.resolve({writeTime: new Date().toISOString()}));
 };
@@ -213,7 +213,7 @@ export const deleteReferenceRecord = (collectionReference: CollectionReference) 
     const data = snapshot.data();
     const deleteFunction = deleteReferences(collectionReference);
 
-    return data.__ref.reduce((promise: Promise<WriteResult>, item: ReferenceUnit) => (
+    return data.__ref.reduce((promise: Promise<WriteResult>, item: DatabaseTypes.ReferenceUnit) => (
         promise.then(() => deleteFunction(item))
     ), Promise.resolve({writeTime: new Date().toISOString()}));
 };

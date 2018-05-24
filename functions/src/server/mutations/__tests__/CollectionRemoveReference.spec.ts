@@ -1,20 +1,23 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
 import {Snapshot, Database} from '../../utils/database';
+import {DatabaseTypes} from "../../../@types";
 
 describe('CollectionRemoveReference', () => {
-
     let database = undefined;
 
     beforeEach(() => {
         database = new Database({
-            '/collections/1': new Snapshot('1', {
+            '/collections/1': new Snapshot<DatabaseTypes.Collection>({
+                _id: '1',
                 __contentType: 'collection/album',
-                name: 'hundur',
+                name: 'Collection Name',
                 __ref: [{
+                    _id: '1',
                     __uuid: '123e4567-e89b-12d3-a456-426655440000',
                     __contentType: 'collection/album'
                 }, {
+                    _id: '1',
                     __uuid: '123e4567-e89b-12d3-a456-426655440001',
                     __contentType: 'collection/album'
                 }]

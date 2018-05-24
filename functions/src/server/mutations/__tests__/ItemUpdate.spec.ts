@@ -1,20 +1,23 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
 import {Database, Snapshot} from '../../utils/database'
+import {DatabaseTypes, GraphQLTypes} from "../../../@types";
 
 describe('ItemUpdate', () => {
     let database = undefined;
 
     beforeEach(() => {
         database = new Database({
-            'item/1': new Snapshot('1', {
-                __contentType: 'artist/person',
-                name: 'hundur',
+            'item/1': new Snapshot<DatabaseTypes.Item>({
+                _id: '1',
+                __contentType: 'item/song',
+                name: 'Item Name',
                 __ref: []
             }),
-            'artists/2': new Snapshot('2', {
-                __contentType: 'collection/album',
-                name: 'some name',
+            'artists/2': new Snapshot<DatabaseTypes.Artist>({
+                _id: '2',
+                __contentType: 'artist/group',
+                name: 'Artist Name',
                 __ref: []
             }),
         });
@@ -24,20 +27,22 @@ describe('ItemUpdate', () => {
         database = undefined;
     });
 
-    test('one', async () => {
+    test('update song name', async () => {
 
         const query = `
             mutation item_update {
-              ItemUpdate(item: "1", values: {name: "new name"}) {
+              ItemUpdate(item: "1", values: {name: "New Name"}) {
+                _id
                 name
               }
             }
         `;
 
-        const expected = {
+        const expected: {data: {ItemUpdate: GraphQLTypes.ItemType}} = {
             data: {
                 ItemUpdate: {
-                    name: 'new name',
+                    _id: '1',
+                    name: 'New Name',
                 }
             }
         };

@@ -12,7 +12,7 @@ import Content from "./Content";
 import Person from "./Person";
 import {orderAlbumType} from '../utils/order';
 import {splitContentType, splitGenre} from '../utils/split';
-import {Reference, ReferenceUnit, Unit} from "../../@types";
+import {DatabaseTypes as D} from "../../@types";
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";
@@ -31,11 +31,11 @@ export const GroupMember = new GraphQLObjectType({
         artist: {
             name: 'Person',
             type: Person,
-            resolve: (root: ReferenceUnit) => root._id.get().then(transformSnapshot)
+            resolve: (root: D.ReferenceUnit) => root._id.get().then(transformSnapshot)
         },
         uuid: {
             type: new GraphQLNonNull(GraphQLUUID),
-            resolve: (root: ReferenceUnit) => root.__uuid
+            resolve: (root: D.ReferenceUnit) => root.__uuid
         }
     })
 });
@@ -70,12 +70,12 @@ const Group = new GraphQLObjectType({
         genres: {
             name: 'genres',
             type: new GraphQLList(Genre),
-            resolve: (root) => root.genres.map(splitGenre)
+            resolve: (root: D.Artist) => root.genres.map(splitGenre)
         },
         periods: {
             name: 'periods',
             type: new GraphQLList(Period),
-            resolve: (root) => ([{
+            resolve: (root: D.Artist) => ([{
                 from: root.from,
                 to: root.to,
             }])
@@ -83,20 +83,19 @@ const Group = new GraphQLObjectType({
         contentType: {
             name: 'contentType',
             type: Content,
-            resolve: (root: Unit) => splitContentType(root.__contentType)
+            resolve: (root: D.ReferenceUnit) => splitContentType(root.__contentType)
         },
         albums: {
             name: 'albums',
             type: new GraphQLList(Collection),
-            resolve (root: Reference) {
+            resolve (root: D.Unit) {
                 const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item:ReferenceUnit) => item.__contentType === 'collection/album')
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album')
                     .map(item => item._id.get());
 
-                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.filter(items => items.exists)
+                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
+                    snapshots.filter(items => items.exists)
                         .map(transformSnapshot)
-                        .filter(item => item !== null)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -105,15 +104,14 @@ const Group = new GraphQLObjectType({
         compilations: {
             name: 'compilations',
             type: new GraphQLList(Collection),
-            resolve (root: Reference) {
+            resolve (root: D.Unit) {
                 const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item:ReferenceUnit) => item.__contentType === 'collection/album+compilation')
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+compilation')
                     .map(item => item._id.get());
 
-                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.filter(items => items.exists)
+                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
+                    snapshots.filter(items => items.exists)
                         .map(transformSnapshot)
-                        .filter(item => item !== null)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -122,15 +120,14 @@ const Group = new GraphQLObjectType({
         eps: {
             name: 'eps',
             type: new GraphQLList(Collection),
-            resolve (root: Reference) {
+            resolve (root: D.Unit) {
                 const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item:ReferenceUnit) => item.__contentType === 'collection/album+ep')
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+ep')
                     .map(item => item._id.get());
 
-                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.filter(items => items.exists)
+                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
+                    snapshots.filter(items => items.exists)
                         .map(transformSnapshot)
-                        .filter(item => item !== null)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -139,15 +136,14 @@ const Group = new GraphQLObjectType({
         singles: {
             name: 'singles',
             type: new GraphQLList(Collection),
-            resolve (root: Reference) {
+            resolve (root: D.Unit) {
                 const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item:ReferenceUnit) => item.__contentType === 'collection/album+single')
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+single')
                     .map(item => item._id.get());
 
-                return Promise.all(referenceUnits).then((items: DocumentSnapshot[]) => (
-                    items.filter(items => items.exists)
+                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
+                    snapshots.filter(items => items.exists)
                         .map(transformSnapshot)
-                        .filter(item => item !== null)
                         .slice()
                         .sort(orderAlbumType)
                 ));
@@ -156,16 +152,16 @@ const Group = new GraphQLObjectType({
         members: {
             name: 'members',
             type: new GraphQLList(GroupMember),
-            resolve: (root: Reference) => {
+            resolve: (root: D.Unit) => {
                 return root.__ref.filter(item => item.__contentType === 'artist/person+member');
             },
         },
         avatar: {
             name: 'avatar',
             type: Image,
-            resolve (root: ReferenceUnit) {
-                const imagesReference: ReferenceUnit = root.__ref
-                    .filter((item: ReferenceUnit) => item.__contentType === 'image/avatar')
+            resolve (root: D.Unit) {
+                const imagesReference: D.ReferenceUnit = root.__ref
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'image/avatar')
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
@@ -176,9 +172,9 @@ const Group = new GraphQLObjectType({
         hero: {
             name: 'hero',
             type: Image,
-            resolve (root: ReferenceUnit) {
-                const imagesReference: ReferenceUnit = root.__ref
-                    .filter((item: ReferenceUnit) => item.__contentType === 'image/hero')
+            resolve (root: D.Unit) {
+                const imagesReference: D.ReferenceUnit = root.__ref
+                    .filter((item: D.ReferenceUnit) => item.__contentType === 'image/hero')
                     .reduce((a, b) => b, undefined);
 
                 return imagesReference
