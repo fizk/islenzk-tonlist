@@ -2,7 +2,7 @@ import {
     GraphQLID, GraphQLNonNull, GraphQLString, GraphQLObjectType, GraphQLInt, GraphQLList,
     GraphQLInputObjectType, GraphQLEnumType
 } from "graphql";
-import Collection from './Collection';
+import Collection, {CollectionConnection} from './Collection';
 import ArtistRole from './ArtistRole';
 import {DatabaseTypes as D} from "../../@types";
 import Genre, {GenreInput} from "./Genre";
@@ -67,13 +67,11 @@ export default new GraphQLObjectType({
             }
         },
         appearsOn: {
-            type: new GraphQLList(Collection),
+            type: new GraphQLList(CollectionConnection),
             resolve(root, params, {database}) {
                 return database.doc(`/reference/${root._id}`).get()
                     .then(doc => doc.data())
                     .then((data: D.Unit) => data.__ref.filter(item => item.__contentType === 'item/song'))
-                    .then((items: D.ReferenceUnit[]) => Promise.all(items.map(item => item._id.get())))
-                    .then(items => items.map(transformSnapshot));
             }
         }
     })

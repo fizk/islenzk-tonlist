@@ -32,16 +32,28 @@ export const artistQuery = gql`
                 avatar {...image}
                 hero {base64 url}
                 albums {
-                    ...collection
+                    uuid
+                    collection {
+                        ...collection
+                    }
                 }
                 compilations {
-                    ...collection
+                    uuid
+                    collection {
+                        ...collection
+                    }
                 }
                 eps {
-                    ...collection
+                    uuid
+                    collection {
+                        ...collection
+                    }
                 }
                 singles {
-                    ...collection
+                    uuid
+                    collection {
+                        ...collection
+                    }
                 }
                 members {
                     uuid
@@ -68,16 +80,28 @@ export const artistQuery = gql`
                 avatar {...image}
                 hero {...image}
                 albums {
-                    ...collection
+                    uuid
+                    collection {
+                        ...collection
+                    }
                 }
                 compilations {
-                    ...collection
+                    uuid
+                    collection {
+                        ...collection
+                    }
                 }
                 eps {
-                    ...collection
+                    uuid
+                    collection {
+                        ...collection
+                    }
                 }
                 singles {
-                    ...collection
+                    uuid
+                    collection {
+                        ...collection
+                    }
                 }
                 association {
                     uuid

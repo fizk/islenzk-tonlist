@@ -6,7 +6,7 @@ import {Time} from '../../elements/Time';
 import {CollectionType} from "../../../../@types";
 
 type Props = {
-    releases: CollectionType[],
+    releases: {uuid: string, collection: CollectionType}[],
 }
 
 export default class ReleasesList extends React.Component<Props> {
@@ -19,13 +19,13 @@ export default class ReleasesList extends React.Component<Props> {
         return (
             <List>
                 {this.props.releases.map(release => (
-                    <ListItemAvatar key={`release-id-${release._id}`} avatar={<Poster src={release.avatar === null ? undefined : release.avatar} />}>
-                        <Link to={`/verk/${release._id}`}>{release.name}</Link>
+                    <ListItemAvatar key={`release-id-${release.collection._id}`} avatar={<Poster src={release.collection.avatar === null ? undefined : release.collection.avatar} />}>
+                        <Link to={`/verk/${release.collection._id}`}>{release.collection.name}</Link>
                         <div>
-                            {release.releaseDates && (<Time>{new Date(release.releaseDates).getFullYear()}</Time>)}
-                            {!release.releaseDates && <Time>-</Time>}
+                            {release.collection.releaseDates && (<Time>{new Date(release.collection.releaseDates).getFullYear()}</Time>)}
+                            {!release.collection.releaseDates && <Time>-</Time>}
                         </div>
-                        {release.artists && release.artists.length > 0 && release.artists.map(artist => (
+                        {release.collection.artists && release.collection.artists.length > 0 && release.collection.artists.map(artist => (
                             <Link key={`listamenn-${artist._id}`} to={`/listamenn/${artist._id}`}>{artist.name}</Link>
                         ))}
                     </ListItemAvatar>

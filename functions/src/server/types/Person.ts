@@ -5,20 +5,39 @@ import {
     GraphQLObjectType,
     GraphQLID
 } from "graphql";
-import Collection from "./Collection";
 import Period from "./Period";
 import Image from "./Image";
 import Genre from "./Genre";
 import Content from "./Content";
 import Group from "./Group";
 import {DatabaseTypes as D} from "../../@types";
-import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import {splitContentType, splitGenre} from "../utils/split";
-import {orderAlbumType} from "../utils/order";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";
 import GraphQLUUID from './GraphQLUUID';
 import {transformSnapshot} from "../utils/transform";
+import {CollectionConnection} from "./Collection";
+
+export const PersonAssociation = new GraphQLObjectType({
+    name: 'PersonAssociation',
+    fields: () => ({
+        periods: {
+            type: new GraphQLList(Period),
+            resolve(root /*@todo MemberType*/) {
+                return root.period || []
+            },
+        },
+        group: {
+            name: 'group',
+            type: Group,
+            resolve: (root: D.ReferenceUnit) => root._id.get().then(transformSnapshot)
+        },
+        uuid: {
+            type: new GraphQLNonNull(GraphQLUUID),
+            resolve: (root: D.ReferenceUnit) => root.__uuid
+        }
+    })
+});
 
 const Person = new GraphQLObjectType({
     name: 'Person',
@@ -64,94 +83,39 @@ const Person = new GraphQLObjectType({
         contentType: {
             name: 'contentType',
             type: Content,
-            resolve: (root: D.Unit) => splitContentType(root.__contentType)
+            resolve: (root: D.ReferenceUnit) => splitContentType(root.__contentType)
         },
         albums: {
             name: 'albums',
-            type: new GraphQLList(Collection),
+            type: new GraphQLList(CollectionConnection),
             resolve (root: D.Unit) {
-                const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album')
-                    .map(item => item._id.get());
-
-                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
-                    snapshots.filter(items => items.exists)
-                        .map(transformSnapshot)
-                        .slice()
-                        .sort(orderAlbumType)
-                ));
+                return  root.__ref.filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album');
             }
         },
         compilations: {
             name: 'compilations',
-            type: new GraphQLList(Collection),
+            type: new GraphQLList(CollectionConnection),
             resolve (root: D.Unit) {
-                const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+compilation')
-                    .map(item => item._id.get());
-
-                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
-                    snapshots.filter(items => items.exists)
-                        .map(transformSnapshot)
-                        .slice()
-                        .sort(orderAlbumType)
-                ));
+                return root.__ref.filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+compilation')
             }
         },
         eps: {
             name: 'eps',
-            type: new GraphQLList(Collection),
+            type: new GraphQLList(CollectionConnection),
             resolve (root: D.Unit) {
-                const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+ep')
-                    .map(item => item._id.get());
-
-                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
-                    snapshots.filter(items => items.exists)
-                        .map(transformSnapshot)
-                        .slice()
-                        .sort(orderAlbumType)
-                ));
+                return root.__ref.filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+ep')
             }
         },
         singles: {
             name: 'singles',
-            type: new GraphQLList(Collection),
+            type: new GraphQLList(CollectionConnection),
             resolve (root: D.Unit) {
-                const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+single')
-                    .map(item => item._id.get());
-
-                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
-                    snapshots.filter(items => items.exists)
-                        .map(transformSnapshot)
-                        .slice()
-                        .sort(orderAlbumType)
-                ));
+                return root.__ref.filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+single')
             }
         },
         association: {
             name: 'association',
-                type: new GraphQLList(new GraphQLObjectType({
-                    name: 'association',
-                    fields: () => ({
-                        periods: {
-                            type: new GraphQLList(Period),
-                            resolve(root /*@todo MemberType*/) {
-                                return root.period || []
-                            },
-                        },
-                        group: {
-                            name: 'group',
-                            type: Group,
-                            resolve: (root: D.ReferenceUnit) => root._id.get().then(transformSnapshot)
-                        },
-                        uuid: {
-                            type: new GraphQLNonNull(GraphQLUUID),
-                            resolve: (root: D.ReferenceUnit) => root.__uuid
-                        }
-                    })
-                })),
+                type: new GraphQLList(PersonAssociation),
                 resolve(root, params, {database}) {
                     return database.doc(`/reference/${root._id}`).get()
                         .then(doc => doc.data())

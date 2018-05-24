@@ -123,7 +123,12 @@ export default class ArtistSection extends React.Component<Props> {
 
                         {{
                             'Group': (<MemberTimeLine
-                                albums={[...this.props.artist.albums, ...this.props.artist.singles, ...this.props.artist.eps, ...this.props.artist.compilations]}
+                                albums={[
+                                    ...this.props.artist.albums.map(album => album.collection),
+                                    ...this.props.artist.singles.map(album => album.collection),
+                                    ...this.props.artist.eps.map(album => album.collection),
+                                    ...this.props.artist.compilations.map(album => album.collection)
+                                ]}
                                 artists={this.props.artist.members}
                             />)
                         }[this.props.artist.__typename]}
