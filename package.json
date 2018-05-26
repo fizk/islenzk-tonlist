@@ -76,7 +76,7 @@
     "eslint-plugin-typescript": "^0.9.0",
     "extract-text-webpack-plugin": "^v3.0.2",
     "jest": "^22.4.3",
-    "mock-cloud-firestore": "^0.3.2",
+    "mock-cloud-firestore": "git+https://github.com/fizk/mock-cloud-firestore.git#a1de9fb58afce2c34244631f7f8210bc3e0470d2",
     "nock": "^9.2.5",
     "node-fetch": "^2.1.2",
     "node-sass": "^4.7.2",
@@ -105,7 +105,12 @@
       "!**/vendor/**",
       "!**/@types/**"
     ],
-    "coverageReporters": ["json", "lcov", "text", "text-summary"],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "text-summary"
+    ],
     "moduleFileExtensions": [
       "js",
       "jsx",
