@@ -27,7 +27,7 @@
   "devDependencies": {
     "@types/jest": "^22.2.3",
     "jest": "^22.4.3",
-    "mock-cloud-firestore": "git+https://github.com/fizk/mock-cloud-firestore.git#a1de9fb58afce2c34244631f7f8210bc3e0470d2",
+    "mock-cloud-firestore": "git+https://github.com/fizk/mock-cloud-firestore.git#93f1caf4c24f0b48642213ffb7f7df82015f6892",
     "nodemon": "^1.17.3",
     "ts-jest": "^22.4.5",
     "ts-node": "^6.0.1",
