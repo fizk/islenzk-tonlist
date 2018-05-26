@@ -1,13 +1,13 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
-import {Database} from '../../utils/database'
 import {GraphQLTypes} from "../../../@types";
+import MockFirebase from 'mock-cloud-firestore';
 
 describe('ArtistAdd', () => {
     let database = undefined;
 
     beforeEach(() => {
-        database = new Database({});
+        database = new MockFirebase({});
     });
 
     afterEach(() => {
@@ -31,8 +31,8 @@ describe('ArtistAdd', () => {
             }
         `;
 
-        //Database size before insert
-        // expect(0).toEqual(database.tableSize);
+        //Database is empty
+        expect(database._data.__collection__).toBeUndefined();
 
         //
         const expected: {data: {ArtistAdd: GraphQLTypes.Artist}} = {
@@ -47,12 +47,12 @@ describe('ArtistAdd', () => {
                 }
             }
         };
-        const actual = await graphql(schema, query, {}, {database});
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
+        expect(actual).toEqual(expected);
 
-        // expect(actual).toEqual(expected);
 
-        //Database size after insert
-        // expect(1).toEqual(database.tableSize);
+        //Database has an object in it
+        expect(database._data.__collection__.artists.__doc__).toBeInstanceOf(Object);
     });
 
     test('add with full values', async () => {
@@ -79,8 +79,8 @@ describe('ArtistAdd', () => {
             }
         `;
 
-        //Database size before insert
-        expect(0).toEqual(database.tableSize);
+        //Database is empty
+        expect(database._data.__collection__).toBeUndefined();
 
         //
         const expected: {data: {ArtistAdd: GraphQLTypes.Artist}} = {
@@ -95,11 +95,11 @@ describe('ArtistAdd', () => {
                 }
             }
         };
-        const actual = await graphql(schema, query, {}, {database});
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
         expect(actual).toEqual(expected);
 
-        // //Database size after insert
-        expect(1).toEqual(database.tableSize);
+        //Database has an object in it
+        expect(database._data.__collection__.artists.__doc__).toBeInstanceOf(Object);
     })
 });
 

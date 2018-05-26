@@ -12,7 +12,7 @@ import Artist from './Artist';
 import {DatabaseTypes as D} from "../../@types";
 import Genre, {GenreInput} from "./Genre";
 import {splitContentType, splitGenre} from '../utils/split'
-import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
+import {DocumentSnapshot} from "@firebase/firestore-types";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";
 import {transformSnapshot} from "../utils/transform";

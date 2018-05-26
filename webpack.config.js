@@ -47,7 +47,7 @@ module.exports = {
             __API_URL__: JSON.stringify(
                 process.env.NODE_ENV === 'production'
                 ? 'https://us-central1-reactscales.cloudfunctions.net'
-                : 'http://localhost:5001/reactscales/us-central1'
+                : 'http://localhost:3000'
             ),
         })
     ],

@@ -1,7 +1,4 @@
-import {DocumentSnapshot, QueryDocumentSnapshot} from '@google-cloud/firestore'
-import {GraphQLTypes} from "../../@types";
-
-export const transformSnapshot = (snapshot: QueryDocumentSnapshot | DocumentSnapshot): GraphQLTypes.UnitType => ({
+export const transformSnapshot = (snapshot) => ({
     ...snapshot.data() ,
     updateTime: snapshot.updateTime,
     createTime: snapshot.createTime,

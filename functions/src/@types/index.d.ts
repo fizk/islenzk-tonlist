@@ -1,5 +1,4 @@
-import admin from "firebase-admin";
-import {Snapshot} from "../server/utils/database";
+import {DocumentReference}from '@firebase/firestore-types'
 
 type ID = string;
 type UUID = string;
@@ -12,7 +11,7 @@ type UUID = string;
 declare namespace DatabaseTypes {
 
     export interface ReferenceUnit {
-        _id: admin.firestore.DocumentReference | Snapshot<any>
+        _id: DocumentReference
         __created?: Date
         __uuid: UUID
         __contentType: string
@@ -122,7 +121,7 @@ declare namespace GraphQLTypes {
         from?: Date
         to?: Date
         albums?: {uuid: string, collection: Collection}[]
-        periods?: {uuid: string, collection: Collection}[]
+        periods?: PeriodType[]
         avatar?: ImageType
         hero?: ImageType
     }

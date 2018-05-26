@@ -1,4 +1,8 @@
 import {DatabaseTypes} from '../../@types'
+import {
+    DocumentSnapshot, DocumentReference, SetOptions, UpdateData, FieldPath,
+    GetOptions, CollectionReference, DocumentData, FirestoreError, DocumentListenOptions
+} from '@firebase/firestore-types'
 
 export class Snapshot<T extends DatabaseTypes.Unit> {
     __data = undefined;
@@ -7,13 +11,17 @@ export class Snapshot<T extends DatabaseTypes.Unit> {
     updateTime = new Date();
     createTime = new Date();
 
+    firestore: any;
+    parent: any;
+    path: any;
+
     constructor(data: T, exists: boolean = true) {
         this.__data = data;
         this.id = data._id;
         this.exists = exists;
     }
 
-    get ref(): Snapshot<T> {
+    get ref() {
         return this;
     }
 
@@ -33,6 +41,20 @@ export class Snapshot<T extends DatabaseTypes.Unit> {
         }
         return Promise.resolve(this)
     }
+
+
+    collection(collectionPath: string): CollectionReference {return null}
+    isEqual(other: DocumentReference): boolean {return false}
+    set(data: DocumentData, options?: SetOptions): Promise<void> {return Promise.resolve()}
+
+
+    delete(): Promise<void> {return Promise.resolve()}
+    onSnapshot(observer: {
+        next?: (snapshot: DocumentSnapshot) => void;
+        error?: (error: FirestoreError) => void;
+        complete?: () => void;
+    }): () => void {return () => {}}
+
 }
 
 export class Database {

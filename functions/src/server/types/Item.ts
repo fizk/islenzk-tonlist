@@ -6,7 +6,7 @@ import Collection, {CollectionConnection} from './Collection';
 import ArtistRole from './ArtistRole';
 import {DatabaseTypes as D} from "../../@types";
 import Genre, {GenreInput} from "./Genre";
-import {splitContentType} from "../utils/split";
+import {splitContentType, splitGenre} from "../utils/split";
 import UnitInterface from "./Unit";
 import Content from "./Content";
 import GraphQLDateTime from "./GraphQLDateTime";
@@ -43,7 +43,7 @@ export default new GraphQLObjectType({
         genres: {
             name: 'genres',
             type: new GraphQLList(Genre),
-            resolve: (root) => splitContentType(root.__contentType)
+            resolve: (root) => root.genres.map(splitGenre)
         },
         instruments: {
             type: new GraphQLList(ArtistRole),

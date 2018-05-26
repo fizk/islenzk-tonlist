@@ -1,7 +1,7 @@
 import {GraphQLObjectType, GraphQLString, GraphQLInputObjectType, GraphQLList} from "graphql";
 import GraphQLDate from './GraphQLDate';
 import Publisher from './Publisher';
-import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
+import {DocumentSnapshot} from "@firebase/firestore-types";
 import {DatabaseTypes as D} from "../../@types";
 import {transformSnapshot} from "../utils/transform";
 

@@ -1,33 +1,48 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
-import {Snapshot, Database} from '../../utils/database';
-import {DatabaseTypes} from "../../../@types";
+import MockFirebase from 'mock-cloud-firestore';
 
 describe('CollectionRemoveReference', () => {
     let database = undefined;
 
     beforeEach(() => {
-        database = new Database({
-            '/collections/1': new Snapshot<DatabaseTypes.Collection>({
-                _id: '1',
-                __contentType: 'collection/album',
-                name: 'Collection Name',
-                __ref: [{
-                    _id:  new Snapshot<DatabaseTypes.Unit>({_id: '1', __contentType: 'collection/album', __ref: []}),
-                    __uuid: '123e4567-e89b-12d3-a456-426655440000',
-                    __contentType: 'collection/album'
-                }, {
-                    _id:  new Snapshot<DatabaseTypes.Unit>({_id: '2', __contentType: 'collection/album', __ref: []}),
-                    __uuid: '123e4567-e89b-12d3-a456-426655440001',
-                    __contentType: 'collection/album'
-                }]
-            }),
+        database = database = new MockFirebase({
+            __collection__: {
+                collections: {
+                    __doc__: {
+                        1: {
+                            __contentType: 'collection/album',
+                            name: 'Collection Name',
+                            __ref: [{
+                                __uuid: '123e4567-e89b-12d3-a456-426655440000',
+                                __contentType: 'collection/album',
+                                _id: '__ref__:items/1'
+                            }, {
+                                __uuid: '123e4567-e89b-12d3-a456-426655440001',
+                                __contentType: 'collection/album',
+                                _id: '__ref__:items/2'
+                            }]
+                        }
+                    }
+                },
+                items: {
+                    1: {
+                        __contentType: 'collection/album',
+                        __ref: []
+                    },
+                    2: {
+                        __contentType: 'collection/album',
+                        __ref: []
+                    },
+                }
+            }
         });
     });
 
     afterEach(() => {
         database = undefined;
     });
+
 
     test('remove one reference', async () => {
         const query = `
@@ -42,14 +57,14 @@ describe('CollectionRemoveReference', () => {
         `;
 
         //Before
-        expect(2).toEqual(database.table['/collections/1'].data().__ref.length);
+        expect(2).toEqual(database._data.__collection__.collections.__doc__[1].__ref.length);
 
         //
-        const actual = await graphql(schema, query, {}, {database});
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
         expect(actual.errors).toBeUndefined();
 
         //After
-        expect(1).toEqual(database.table['/collections/1'].data().__ref.length);
+        expect(1).toEqual(database._data.__collection__.collections.__doc__[1].__ref.length);
     });
 
     test('no reference found', async () => {
@@ -65,14 +80,14 @@ describe('CollectionRemoveReference', () => {
         `;
 
         //Before
-        expect(2).toEqual(database.table['/collections/1'].data().__ref.length);
+        expect(2).toEqual(database._data.__collection__.collections.__doc__[1].__ref.length);
 
         //
-        const actual = await graphql(schema, query, {}, {database});
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
         expect(actual.errors).toBeUndefined();
 
         //After
-        expect(2).toEqual(database.table['/collections/1'].data().__ref.length);
+        expect(2).toEqual(database._data.__collection__.collections.__doc__[1].__ref.length);
     });
 });
 

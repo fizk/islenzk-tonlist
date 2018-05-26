@@ -18,7 +18,7 @@ const fragmentMatcher = new IntrospectionFragmentMatcher({
 const client = new ApolloClient({
     cache: new InMemoryCache({ fragmentMatcher }),
     link: new HttpLink({
-        uri: 'http://localhost:5000/islenzktonlist/us-central1/api/graphql'
+        uri: 'http://localhost:3000/graphql'
     })
 });
 

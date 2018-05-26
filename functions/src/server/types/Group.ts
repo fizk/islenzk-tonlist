@@ -86,8 +86,8 @@ const Group = new GraphQLObjectType({
         albums: {
             name: 'albums',
             type: new GraphQLList(CollectionConnection),
-            resolve (root: D.Unit) {
-                return  root.__ref.filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album');
+            resolve: async (root: D.Unit) => {
+                return  root.__ref.filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album')
             }
         },
         compilations: {

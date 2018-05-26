@@ -1,25 +1,29 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
-import {Snapshot, Database} from '../../utils/database';
-import {DatabaseTypes, GraphQLTypes} from "../../../@types";
+import {GraphQLTypes} from "../../../@types";
+import MockFirebase from 'mock-cloud-firestore';
 
 describe('ArtistAddMember', () => {
     let database = undefined;
 
     beforeEach(() => {
-        database = new Database({
-            '/artists/1': new Snapshot<DatabaseTypes.Artist>({
-                _id: '1',
-                __contentType: 'artist/group',
-                name: 'Artist Name',
-                __ref: []
-            }),
-            'artists/2': new Snapshot<DatabaseTypes.Artist>({
-                _id: '2',
-                __contentType: 'artist/person',
-                name: 'Collection Name',
-                __ref: []
-            }),
+        database = database = new MockFirebase({
+            __collection__: {
+                artists: {
+                    __doc__: {
+                        '1': {
+                            __contentType: 'artist/group',
+                            name: 'Artist Name',
+                            __ref: []
+                        },
+                        '2': {
+                            __contentType: 'artist/person',
+                            name: 'Collection Name',
+                            __ref: []
+                        }
+                    }
+                },
+            }
         });
     });
 
@@ -57,7 +61,7 @@ describe('ArtistAddMember', () => {
                 }
             }
         };
-        const actual = await graphql(schema, query, {}, {database});
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
         expect(actual).toMatchShapeOf(expected);
         expect(actual.errors).toBeUndefined();
     });

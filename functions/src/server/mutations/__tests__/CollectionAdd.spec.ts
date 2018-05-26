@@ -1,13 +1,13 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
-import {Database} from '../../utils/database'
+import MockFirebase from 'mock-cloud-firestore';
 import {GraphQLTypes} from "../../../@types";
 
 describe('CollectionAdd', () => {
     let database = undefined;
 
     beforeEach(() => {
-        database = new Database({});
+        database = new MockFirebase({});
     });
 
     afterEach(() => {
@@ -15,7 +15,6 @@ describe('CollectionAdd', () => {
     });
 
     test('add new album', async () => {
-
         const query = `
             mutation create_collection {
               CollectionAdd(type: album, values: {name:"new album" }) {
@@ -30,10 +29,6 @@ describe('CollectionAdd', () => {
             }
         `;
 
-        //Database size before insert
-        expect(0).toEqual(database.tableSize);
-
-        //
         const expected: {data: {CollectionAdd: GraphQLTypes.Collection}} = {
             data: {
                 CollectionAdd: {
@@ -47,12 +42,12 @@ describe('CollectionAdd', () => {
                 }
             }
         };
-        const actual = await graphql(schema, query, {}, {database});
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
         expect(actual).toEqual(expected);
         expect(actual.errors).toBeUndefined();
 
         //Database size after insert
-        expect(1).toEqual(database.tableSize);
+        expect(database._data.__collection__.collections).toBeInstanceOf(Object)
     })
 });
 

@@ -12,8 +12,8 @@ export default {
             type: new GraphQLNonNull(CollectionInput)
         },
     },
-    resolve (root, {values, artist}, {database,}) {
-        const document = database.doc(`collections/${artist}`);
+    resolve (root, {values, collection}, {database,}) {
+        const document = database.doc(`collections/${collection}`);
 
         return document.update(Object.assign({}, values))
             .then(() => document.get())
