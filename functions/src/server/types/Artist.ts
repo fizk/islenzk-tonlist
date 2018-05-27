@@ -3,7 +3,8 @@ import {
     GraphQLString,
     GraphQLList,
     GraphQLInputObjectType,
-    GraphQLUnionType, GraphQLEnumType
+    GraphQLUnionType,
+    GraphQLEnumType
 } from "graphql";
 import {PeriodTypeInput} from './Period';
 import Group from "./Group";

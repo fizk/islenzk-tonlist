@@ -10,7 +10,7 @@ export interface ItemType {
     description: string
     duration: number
     genres: GenreType[],
-    appearsOn: CollectionType[]
+    appearsOn: {uuid: string, collection: CollectionType}[]
     hero: ImageType
     avatar: ImageType
 }
@@ -51,10 +51,10 @@ export interface ArtistPersonType {
     periods: PeriodType[],
     genres: GenreType[],
     contentType: ContentTypeType,
-    albums: CollectionType[],
-    compilations: CollectionType[],
-    eps: CollectionType[],
-    singles: CollectionType[],
+    albums: {uuid: string, collection: CollectionType}[],
+    compilations: {uuid: string, collection: CollectionType}[],
+    eps: {uuid: string, collection: CollectionType}[],
+    singles: {uuid: string, collection: CollectionType}[],
     association: {
         group: ArtistType,
         periods: PeriodType[],
@@ -71,10 +71,10 @@ export interface ArtistGroupType {
     periods: PeriodType[],
     genres: GenreType[],
     contentType: ContentTypeType,
-    albums: CollectionType[],
-    compilations: CollectionType[],
-    eps: CollectionType[],
-    singles: CollectionType[],
+    albums: {uuid: string, collection: CollectionType}[],
+    compilations: {uuid: string, collection: CollectionType}[],
+    eps: {uuid: string, collection: CollectionType}[],
+    singles: {uuid: string, collection: CollectionType}[],
     members: {
         artist: ArtistType,
         periods: PeriodType[],

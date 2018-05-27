@@ -1,25 +1,33 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
-import {Snapshot, Database} from '../../utils/database';
-import {DatabaseTypes, GraphQLTypes} from "../../../@types";
+import {GraphQLTypes} from "../../../@types";
+import MockFirebase from 'mock-cloud-firestore';
 
 describe('ArtistAddCollection', () => {
     let database = undefined;
 
     beforeEach(() => {
-        database = new Database({
-            '/artists/1': new Snapshot<DatabaseTypes.Artist>({
-                _id: '1',
-                __contentType: 'artist/person',
-                name: 'Artist Name',
-                __ref: [],
-            }),
-            'collections/2': new Snapshot<DatabaseTypes.Collection>({
-                _id: '2',
-                __contentType: 'collection/album',
-                name: 'Collection Name',
-                __ref: []
-            }),
+        database = database = new MockFirebase({
+            __collection__: {
+                artists: {
+                    __doc__: {
+                        '1': {
+                            __contentType: 'artist/person',
+                            name: 'Artist Name',
+                            __ref: [],
+                        }
+                    }
+                },
+                collections: {
+                    __doc__: {
+                        '2': {
+                            __contentType: 'collection/album',
+                            name: 'Collection Name',
+                            __ref: []
+                        }
+                    }
+                }
+            }
         });
     });
 
@@ -36,9 +44,13 @@ describe('ArtistAddCollection', () => {
                   _id
                   name
                   albums {
-                    __typename
-                    _id
-                    name
+                    uuid
+                    collection {
+                        __typename
+                        _id
+                        name
+                    }
+                    
                   }
                 }
               }
@@ -51,16 +63,21 @@ describe('ArtistAddCollection', () => {
                     __typename: 'Person',
                     _id: '1',
                     name: 'Artist Name',
-                    albums: [{
-                        __typename: 'Collection',
-                        _id: '2',
-                        name: 'Collection Name',
-                    }]
+                    albums: [
+                        {
+                            uuid: '1234',
+                            collection: {
+                                __typename: 'Collection',
+                                _id: '2',
+                                name: 'Collection Name',
+                            }
+                        },
+                    ]
                 }
             }
         };
-        const actual = await graphql(schema, query, {}, {database});
-        expect(actual).toEqual(expected);
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
+        expect(actual).toMatchShapeOf(expected);
         expect(actual.errors).toBeUndefined();
     });
 
@@ -73,8 +90,11 @@ describe('ArtistAddCollection', () => {
                   _id
                   name
                   albums {
-                    _id
-                    name
+                    uuid
+                    collection {
+                        _id
+                        name
+                    }
                   }
                 }
               }
@@ -86,42 +106,10 @@ describe('ArtistAddCollection', () => {
                 ArtistAddCollection: null
             }
         };
-        const actual = await graphql(schema, query, {}, {database});
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
 
         expect(actual.data).toEqual(expected.data);
         expect(actual.errors).toBeInstanceOf(Array)
-    });
-
-    test('collection not found', async () => {
-        const query = `
-            mutation artist_add_collection {
-              ArtistAddCollection (artist: "1", collection: "invalid-id", collectionType: album) {
-                __typename
-                ... on Person {
-                  _id
-                  name
-                  albums {
-                    _id
-                    name
-                  }
-                }
-              }
-            }
-        `;
-
-        const expected: {data: {ArtistAddCollection: GraphQLTypes.Artist}} = {
-            data: {
-                ArtistAddCollection: {
-                    __typename: 'Person',
-                    _id: '1',
-                    name: 'Artist Name',
-                    albums: []
-                }
-            }
-        };
-        const actual = await graphql(schema, query, {}, {database});
-        expect(actual.data).toEqual(expected.data);
-        expect(actual.errors).toBeUndefined();
     });
 });
 

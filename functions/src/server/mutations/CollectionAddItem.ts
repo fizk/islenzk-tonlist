@@ -37,7 +37,7 @@ export default {
                     __uuid: uuid(),
                     position: position
                 };
-                return snapshot.ref.update('__ref', [...data.__ref, reference])
+                return snapshot.ref.update({__ref: [...data.__ref, reference]})
             })
             .then(() => document.get())
             .then((snapshot: QueryDocumentSnapshot) => snapshot.exists ? transformSnapshot(snapshot) : null);

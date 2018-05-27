@@ -4,20 +4,18 @@ import {
     GraphQLString,
     GraphQLList,GraphQLID
 } from "graphql";
-import Collection from "./Collection";
 import Period from "./Period";
 import Image from "./Image";
 import Genre from "./Genre";
 import Content from "./Content";
 import Person from "./Person";
-import {orderAlbumType} from '../utils/order';
 import {splitContentType, splitGenre} from '../utils/split';
 import {DatabaseTypes as D} from "../../@types";
-import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";
 import GraphQLUUID from './GraphQLUUID';
 import {transformSnapshot} from "../utils/transform";
+import {CollectionConnection} from "./Collection";
 
 export const GroupMember = new GraphQLObjectType({
     name: 'GroupMember',
@@ -87,66 +85,30 @@ const Group = new GraphQLObjectType({
         },
         albums: {
             name: 'albums',
-            type: new GraphQLList(Collection),
-            resolve (root: D.Unit) {
-                const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album')
-                    .map(item => item._id.get());
-
-                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
-                    snapshots.filter(items => items.exists)
-                        .map(transformSnapshot)
-                        .slice()
-                        .sort(orderAlbumType)
-                ));
+            type: new GraphQLList(CollectionConnection),
+            resolve: async (root: D.Unit) => {
+                return  root.__ref.filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album')
             }
         },
         compilations: {
             name: 'compilations',
-            type: new GraphQLList(Collection),
+            type: new GraphQLList(CollectionConnection),
             resolve (root: D.Unit) {
-                const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+compilation')
-                    .map(item => item._id.get());
-
-                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
-                    snapshots.filter(items => items.exists)
-                        .map(transformSnapshot)
-                        .slice()
-                        .sort(orderAlbumType)
-                ));
+                return root.__ref.filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+compilation')
             }
         },
         eps: {
             name: 'eps',
-            type: new GraphQLList(Collection),
+            type: new GraphQLList(CollectionConnection),
             resolve (root: D.Unit) {
-                const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+ep')
-                    .map(item => item._id.get());
-
-                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
-                    snapshots.filter(items => items.exists)
-                        .map(transformSnapshot)
-                        .slice()
-                        .sort(orderAlbumType)
-                ));
+                return root.__ref.filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+ep')
             }
         },
         singles: {
             name: 'singles',
-            type: new GraphQLList(Collection),
+            type: new GraphQLList(CollectionConnection),
             resolve (root: D.Unit) {
-                const referenceUnits: Promise<DocumentSnapshot>[] = root.__ref
-                    .filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+single')
-                    .map(item => item._id.get());
-
-                return Promise.all(referenceUnits).then((snapshots: DocumentSnapshot[]) => (
-                    snapshots.filter(items => items.exists)
-                        .map(transformSnapshot)
-                        .slice()
-                        .sort(orderAlbumType)
-                ));
+                return root.__ref.filter((item: D.ReferenceUnit) => item.__contentType === 'collection/album+single')
             }
         },
         members: {

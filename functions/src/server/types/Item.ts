@@ -1,16 +1,21 @@
 import {
-    GraphQLID, GraphQLNonNull, GraphQLString, GraphQLObjectType, GraphQLInt, GraphQLList,
-    GraphQLInputObjectType, GraphQLEnumType
+    GraphQLID,
+    GraphQLNonNull,
+    GraphQLString,
+    GraphQLObjectType,
+    GraphQLInt,
+    GraphQLList,
+    GraphQLInputObjectType,
+    GraphQLEnumType
 } from "graphql";
-import Collection from './Collection';
+import {CollectionConnection} from './Collection';
 import ArtistRole from './ArtistRole';
 import {DatabaseTypes as D} from "../../@types";
 import Genre, {GenreInput} from "./Genre";
-import {splitContentType} from "../utils/split";
+import {splitContentType, splitGenre} from "../utils/split";
 import UnitInterface from "./Unit";
 import Content from "./Content";
 import GraphQLDateTime from "./GraphQLDateTime";
-import {transformSnapshot} from "../utils/transform";
 
 export default new GraphQLObjectType({
     name: 'Item',
@@ -43,7 +48,7 @@ export default new GraphQLObjectType({
         genres: {
             name: 'genres',
             type: new GraphQLList(Genre),
-            resolve: (root) => splitContentType(root.__contentType)
+            resolve: (root) => root.genres.map(splitGenre)
         },
         instruments: {
             type: new GraphQLList(ArtistRole),
@@ -67,13 +72,11 @@ export default new GraphQLObjectType({
             }
         },
         appearsOn: {
-            type: new GraphQLList(Collection),
+            type: new GraphQLList(CollectionConnection),
             resolve(root, params, {database}) {
                 return database.doc(`/reference/${root._id}`).get()
                     .then(doc => doc.data())
                     .then((data: D.Unit) => data.__ref.filter(item => item.__contentType === 'item/song'))
-                    .then((items: D.ReferenceUnit[]) => Promise.all(items.map(item => item._id.get())))
-                    .then(items => items.map(transformSnapshot));
             }
         }
     })

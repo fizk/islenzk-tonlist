@@ -12,12 +12,13 @@ import Artist from './Artist';
 import {DatabaseTypes as D} from "../../@types";
 import Genre, {GenreInput} from "./Genre";
 import {splitContentType, splitGenre} from '../utils/split'
-import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
+import {DocumentSnapshot} from "@firebase/firestore-types";
 import UnitInterface from "./Unit";
 import GraphQLDateTime from "./GraphQLDateTime";
 import {transformSnapshot} from "../utils/transform";
+import GraphQLUUID from "./GraphQLUUID";
 
-export default new GraphQLObjectType({
+const Collection = new GraphQLObjectType({
     name: 'Collection',
     description: 'A single collection',
     interfaces: [UnitInterface],
@@ -142,6 +143,8 @@ export default new GraphQLObjectType({
     })
 });
 
+export default Collection;
+
 export const CollectionInput = new GraphQLInputObjectType({
     name: 'CollectionInput',
     fields: {
@@ -176,5 +179,19 @@ export const CollectionType = new GraphQLEnumType({
         single: {value: 'album+single'},
         compilation: {value: 'album+compilation'},
     }
+});
+
+export const CollectionConnection = new GraphQLObjectType({
+    name: 'CollectionConnection',
+    fields: () => ({
+        collection: {
+            type: Collection,
+            resolve: (root: D.ReferenceUnit) => root._id.get().then(transformSnapshot)
+        },
+        uuid: {
+            type: new GraphQLNonNull(GraphQLUUID),
+            resolve: (root: D.ReferenceUnit) => root.__uuid
+        }
+    })
 });
 

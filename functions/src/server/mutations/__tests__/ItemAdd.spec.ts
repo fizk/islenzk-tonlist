@@ -1,13 +1,13 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
-import {Database} from '../../utils/database'
+import MockFirebase from 'mock-cloud-firestore';
 import {GraphQLTypes} from "../../../@types";
 
 describe('ItemAdd', () => {
     let database = undefined;
 
     beforeEach(() => {
-        database = new Database({});
+        database = new MockFirebase({});
     });
 
     afterEach(() => {
@@ -25,7 +25,7 @@ describe('ItemAdd', () => {
         `;
 
         //Database size before insert
-        expect(0).toEqual(database.tableSize);
+        expect(database._data.__collection__).toBeUndefined();
 
         //
         const expected: {data: {ItemAdd: GraphQLTypes.ItemType}} = {
@@ -36,11 +36,11 @@ describe('ItemAdd', () => {
                 }
             }
         };
-        const actual = await graphql(schema, query, {}, {database});
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
         expect(actual).toMatchShapeOf(expected);
 
         //Database size after insert
-        expect(1).toEqual(database.tableSize);
+        expect(database._data.__collection__.items.__doc__).toBeInstanceOf(Object);
     })
 });
 

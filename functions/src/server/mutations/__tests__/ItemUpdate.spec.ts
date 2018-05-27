@@ -1,25 +1,33 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
-import {Database, Snapshot} from '../../utils/database'
-import {DatabaseTypes, GraphQLTypes} from "../../../@types";
+import MockFirebase from 'mock-cloud-firestore';
+import {GraphQLTypes} from "../../../@types";
 
 describe('ItemUpdate', () => {
     let database = undefined;
 
     beforeEach(() => {
-        database = new Database({
-            'item/1': new Snapshot<DatabaseTypes.Item>({
-                _id: '1',
-                __contentType: 'item/song',
-                name: 'Item Name',
-                __ref: []
-            }),
-            'artists/2': new Snapshot<DatabaseTypes.Artist>({
-                _id: '2',
-                __contentType: 'artist/group',
-                name: 'Artist Name',
-                __ref: []
-            }),
+        database = database = new MockFirebase({
+            __collection__: {
+                artists: {
+                    __doc__: {
+                        2: {
+                            __contentType: 'artist/group',
+                            name: 'Artist Name',
+                            __ref: []
+                        }
+                    }
+                },
+                item: {
+                    __doc__: {
+                        1: {
+                            __contentType: 'item/song',
+                            name: 'Item Name',
+                            __ref: []
+                        }
+                    }
+                },
+            }
         });
     });
 
@@ -28,7 +36,6 @@ describe('ItemUpdate', () => {
     });
 
     test('update song name', async () => {
-
         const query = `
             mutation item_update {
               ItemUpdate(item: "1", values: {name: "New Name"}) {
@@ -46,7 +53,7 @@ describe('ItemUpdate', () => {
                 }
             }
         };
-        const actual = await graphql(schema, query, {}, {database});
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
         expect(actual).toEqual(expected);
         expect(actual.errors).toBeUndefined();
     })

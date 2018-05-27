@@ -10,22 +10,26 @@ const itemQuery = gql`
             description
             duration
             name
-            genres {type style}
+            genres {style type}
             appearsOn {
-                _id
-                name
-                releaseDates
-                avatar {url base64}
-                artists {
-                    ... on Person {
-                        _id
-                        name
-                    }
-                    ... on Group {
-                        _id
-                        name
-                    }
+                collection {
+                    _id
+                    name
+                    releaseDates
+                    avatar {url base64}
+                    artists {
+                        ... on Person {
+                            _id
+                            name
+                        }
+                        ... on Group {
+                            _id
+                            name
+                        }
+                    }                    
                 }
+                uuid
+
             }
         }
     }

@@ -1,25 +1,28 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
-import {Database, Snapshot} from '../../utils/database'
-import {DatabaseTypes} from "../../../@types";
+import MockFirebase from 'mock-cloud-firestore';
 
 describe('CollectionUpdate', () => {
     let database = undefined;
 
     beforeEach(() => {
-        database = new Database({
-            'collection/1': new Snapshot<DatabaseTypes.Collection>({
-                _id: '1',
-                __contentType: 'collection/album',
-                name: 'Collection Album #1',
-                __ref: []
-            }),
-            'collection/2': new Snapshot<DatabaseTypes.Collection>({
-                _id: '2',
-                __contentType: 'collection/album',
-                name: 'Collection Album #2',
-                __ref: []
-            }),
+        database = database = new MockFirebase({
+            __collection__: {
+                collections: {
+                    __doc__: {
+                        1: {
+                            __contentType: 'collection/album',
+                            name: 'Collection Album #1',
+                            __ref: []
+                        },
+                        2: {
+                            __contentType: 'collection/album',
+                            name: 'Collection Album #2',
+                            __ref: []
+                        }
+                    }
+                }
+            }
         });
     });
 
@@ -28,7 +31,6 @@ describe('CollectionUpdate', () => {
     });
 
     test('update name', async () => {
-
         const query = `
             mutation collection_update {
               CollectionUpdate(collection: "1", values: {name: "New Name"}) {
@@ -44,7 +46,7 @@ describe('CollectionUpdate', () => {
                 }
             }
         };
-        const actual = await graphql(schema, query, {}, {database});
+        const actual = await graphql(schema, query, {}, {database: database.firestore()});
         expect(actual).toEqual(expected);
         expect(actual.errors).toBeUndefined();
     })
