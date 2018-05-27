@@ -3,15 +3,12 @@ import {
     GraphQLString,
     GraphQLList,
     GraphQLInputObjectType,
-    GraphQLUnionType, GraphQLEnumType, GraphQLObjectType
+    GraphQLUnionType,
+    GraphQLEnumType
 } from "graphql";
 import {PeriodTypeInput} from './Period';
 import Group from "./Group";
 import Person from "./Person";
-import {transformSnapshot} from "../utils/transform";
-import {DatabaseTypes as D} from "../../@types";
-import GraphQLUUID from "./GraphQLUUID";
-import Collection from "./Collection";
 
 export default new GraphQLUnionType({
     name: 'Artist',

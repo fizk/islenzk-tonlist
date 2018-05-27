@@ -1,8 +1,14 @@
 import {
-    GraphQLID, GraphQLNonNull, GraphQLString, GraphQLObjectType, GraphQLInt, GraphQLList,
-    GraphQLInputObjectType, GraphQLEnumType
+    GraphQLID,
+    GraphQLNonNull,
+    GraphQLString,
+    GraphQLObjectType,
+    GraphQLInt,
+    GraphQLList,
+    GraphQLInputObjectType,
+    GraphQLEnumType
 } from "graphql";
-import Collection, {CollectionConnection} from './Collection';
+import {CollectionConnection} from './Collection';
 import ArtistRole from './ArtistRole';
 import {DatabaseTypes as D} from "../../@types";
 import Genre, {GenreInput} from "./Genre";
@@ -10,7 +16,6 @@ import {splitContentType, splitGenre} from "../utils/split";
 import UnitInterface from "./Unit";
 import Content from "./Content";
 import GraphQLDateTime from "./GraphQLDateTime";
-import {transformSnapshot} from "../utils/transform";
 
 export default new GraphQLObjectType({
     name: 'Item',

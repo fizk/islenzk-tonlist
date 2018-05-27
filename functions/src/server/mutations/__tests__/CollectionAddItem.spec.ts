@@ -1,7 +1,6 @@
 import { graphql } from 'graphql';
 import schema from '../../schema';
-import {Snapshot, Database} from '../../utils/database';
-import {DatabaseTypes, GraphQLTypes} from "../../../@types";
+import {GraphQLTypes} from "../../../@types";
 import MockFirebase from 'mock-cloud-firestore';
 
 describe('CollectionAddItem', () => {
@@ -30,20 +29,6 @@ describe('CollectionAddItem', () => {
                 }
             }
         });
-        // database = new Database({
-        //     'items/2': new Snapshot<DatabaseTypes.Item>({
-        //         _id: '2',
-        //         __contentType: 'item/song',
-        //         name: 'Item Name',
-        //         __ref: []
-        //     }),
-        //     'collections/2': new Snapshot<DatabaseTypes.Collection>({
-        //         _id: '2',
-        //         __contentType: 'collection/album',
-        //         name: 'Collection Name',
-        //         __ref: []
-        //     }),
-        // });
     });
 
     afterEach(() => {
