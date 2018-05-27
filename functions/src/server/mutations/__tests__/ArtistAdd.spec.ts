@@ -15,7 +15,6 @@ describe('ArtistAdd', () => {
     });
 
     test('add with default values', async () => {
-
         const query = `
             mutation {
               ArtistAdd(values: {name: "New Artist"}, type: person) {
