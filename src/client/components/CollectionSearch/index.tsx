@@ -94,7 +94,6 @@ export default class CollectionSearch extends React.Component<Props, State, {cli
             //     }
             // }
         }).then((result: FetchResult) => {
-            console.log(result);
             this.props.onSelect(result.data.CollectionAdd);
         });
     }
