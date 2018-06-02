@@ -4,6 +4,7 @@ import { action } from '@storybook/addon-actions';
 import {BrowserRouter as Router} from 'react-router-dom';
 import ArtistSection from '../../src/client/sections/ArtistSection/ArtistSection';
 import {ArtistType} from "../../@types";
+import {boolean, withKnobs} from '@storybook/addon-knobs/react';
 import '../../src/client/components/App/_index.scss';
 
 const standardArtist: ArtistType & {__typename: string} = {
@@ -441,7 +442,7 @@ const standardArtist: ArtistType & {__typename: string} = {
     },
 };
 
-storiesOf('Sections/ArtistSection', module)
+storiesOf('Sections/ArtistSection', module).addDecorator(withKnobs)
     .add('Empty', () => (
         <ArtistSection id={''} loading={false} artist={undefined} />
     ))
@@ -450,4 +451,13 @@ storiesOf('Sections/ArtistSection', module)
             <ArtistSection id={''} loading={false} artist={standardArtist} />
         </Router>
     ))
+    .add('Loading', () => {
+        const isLoading = boolean('loading', true);
+
+        return (
+            <Router location={''}>
+                <ArtistSection id={''} loading={isLoading} artist={isLoading ? undefined : standardArtist} />
+            </Router>
+        );
+    })
 ;

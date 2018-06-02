@@ -206,8 +206,9 @@ export default compose(
     }),
     graphql(artistQuery, {
         props: (all: any) => ({
-            artist: all.data.loading === false ? all.data.Artist : undefined,
-            loading: all.data.loading,
+            artist: (all.data.Artist || undefined),
+            isFound: (Boolean(all.data.Artist) || false),
+            loading: all.data.loading
         }),
         options: ({id, }: {[key: string]: any}) => ({
             variables: {

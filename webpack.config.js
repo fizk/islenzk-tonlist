@@ -55,6 +55,7 @@ module.exports = {
         contentBase: path.join(__dirname, 'public'),
         port: 3001,
         hot: false,
+        inline: false,
         historyApiFallback: true,
         headers: {
             'Access-Control-Allow-Origin': '*',
